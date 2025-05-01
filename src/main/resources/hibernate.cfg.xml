@@ -11,12 +11,10 @@
         <property name="hibernate.connection.username">root</property>
         <property name="hibernate.connection.password">myl1234!</property>
 
-        <!-- Optional, but safe -->
-        <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
-
+        <property name="hibernate.connection.provider_class"> org.hibernate.hikaricp.internal.HikariCPConnectionProvider </property>
         <!-- Hibernate tuning -->
         <property name="hibernate.hbm2ddl.auto">validate</property>
-        <property name="hibernate.show_sql">true</property>
+        <property name="hibernate.show_sql">false</property>
 
         <!-- Your annotated entities go here -->
         <!-- Example: -->

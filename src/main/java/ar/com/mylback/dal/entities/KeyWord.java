@@ -7,19 +7,31 @@ import java.util.Set;
 
 @Entity
 @Table(name = "key_words")
-public class KeyWord {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "key_word_id")
-    private Integer id;
-
-    @Column(name = "key_word_name", length = 50,nullable = false, unique = true)
-    private String name;
+@AttributeOverrides({
+        @AttributeOverride(name = "id",
+                column = @Column(name = "key_word_id")
+        ),
+        @AttributeOverride(name = "name",
+                column = @Column(name = "key_word_name", length = 50)
+        )
+})
+public class KeyWord extends CardProperties {
+    @Column(name = "definition", length = 500, nullable = false, unique = true)
+    private String definition;
 
     @ManyToMany(mappedBy = "keyWords")
     private Set<Card> cards = new HashSet<>();
 
-    public KeyWord() {}
+    public KeyWord() {
+    }
+
+    public String getDefinition() {
+        return definition;
+    }
+
+    public void setDefinition(String definition) {
+        this.definition = definition;
+    }
 
     public Set<Card> getCards() {
         return cards;
@@ -27,21 +39,5 @@ public class KeyWord {
 
     public void setCards(Set<Card> cards) {
         this.cards = cards;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 }
