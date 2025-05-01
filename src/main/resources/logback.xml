@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!--
+      Console appender that prints to stdout
+    -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Root logger at INFO (so libraries below INFO are hidden) -->
+    <root level="WARN">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+    <!-- Silence Hibernate completely (no SQL, no warnings) -->
+    <logger name="org.hibernate" level="OFF"/>
+    <logger name="com.zaxxer.hikari" level="OFF"/>
+
+
+    <!-- If you also want to silence C3P0 / Hikari internals, you can add these too: -->
+    <!--
+    <logger name="com.zaxxer.hikari" level="OFF"/>
+    <logger name="org.hibernate.hikaricp" level="OFF"/>
+    -->
+</configuration>

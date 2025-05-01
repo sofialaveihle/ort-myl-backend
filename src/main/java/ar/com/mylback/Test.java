@@ -5,8 +5,11 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
+import java.util.UUID;
+
 public class Test {
     public static void main(String[] args) {
+        System.out.println(Runtime.version());
         SessionFactory sessionFactory = new Configuration()
                 .configure("hibernate.cfg.xml")
                 .addAnnotatedClass(Card.class)
@@ -41,17 +44,18 @@ public class Test {
             session.persist(type);
 
             Format format = new Format();
-            format.setFormatName("Imperio");
+            format.setName("Imperio");
             session.persist(format);
 
             KeyWord keyWord = new KeyWord();
             keyWord.setName("Furia");
+            keyWord.setDefinition("descripcion de furia");
             session.persist(keyWord);
 
             // Create the card
             Card card = new Card();
-            card.setImageUrl("fotos/furia-bestia.jpg");
             card.setName("Bestia de Furia");
+            card.setImageUuid(UUID.randomUUID());
             card.setDescription("Inflige doble daño si tiene Furia.");
             card.setCost(4);
             card.setDamage(8);

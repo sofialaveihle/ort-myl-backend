@@ -7,34 +7,19 @@ import java.util.Set;
 
 @Entity
 @Table(name = "races")
-public class Race {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "race_id")
-    private Integer id;
-
-    @Column(name = "race_name")
-    private String name;
-
+@AttributeOverrides({
+        @AttributeOverride(name = "id",
+                column = @Column(name = "race_id")
+        ),
+        @AttributeOverride(name = "name",
+                column = @Column(name = "race_name", length = 50)
+        )
+})
+public class Race extends CardProperties {
     @OneToMany(mappedBy = "race", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Card> cards = new HashSet<>();
 
-    public Race() {}
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public Race() {
     }
 
     public Set<Card> getCards() {

@@ -4,22 +4,23 @@ import jakarta.persistence.*;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(name = "cards")
-public class Card {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "card_id")
-    private Integer id;
+@AttributeOverrides({
+        @AttributeOverride(name = "id",
+                column = @Column(name = "card_id")
+        ),
+        @AttributeOverride(name = "name",
+                column = @Column(name = "card_name", length = 100)
+        )
+})
+public class Card extends CardProperties {
+    @Column(name = "image_uuid", columnDefinition = "BINARY(16)", nullable = false, unique = true)
+    private UUID imageUuid;
 
-    @Column(name = "image_url", length = 100, nullable = false)
-    private String imageUrl;
-
-    @Column(name = "card_name", length = 50, nullable = false)
-    private String name;
-
-    @Column(name = "ability", length = 50)
+    @Column(name = "ability", length = 1000)
     private String description;
 
     @Column(name = "cost")
@@ -29,7 +30,7 @@ public class Card {
     private Integer damage;
 
     @ManyToOne
-    @JoinColumn(name = "collection_id")
+    @JoinColumn(name = "collection_id", nullable = false)
     private Collection collection;
 
     @ManyToOne
@@ -62,28 +63,12 @@ public class Card {
 
     public Card() {}
 
-    public Integer getId() {
-        return id;
+    public UUID getImageUuid() {
+        return imageUuid;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public void setImageUuid(UUID imageUuid) {
+        this.imageUuid = imageUuid;
     }
 
     public String getDescription() {
