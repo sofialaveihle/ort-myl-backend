@@ -2,10 +2,12 @@ package ar.com.mylback.dal.crud;
 
 import ar.com.mylback.MylException;
 import ar.com.mylback.dal.entities.CardProperties;
+import org.hibernate.Session;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 
 public class DAOCardProperties<T extends CardProperties, ID extends Serializable> extends DAO<T, ID> {
 
@@ -14,7 +16,7 @@ public class DAOCardProperties<T extends CardProperties, ID extends Serializable
     }
 
     public T findByName(String value) throws MylException {
-        return HibernateUtil.withSession(session ->
+        return HibernateUtil.withTransaction((Function<Session, T>) session ->
                 session.createQuery(
                                 "FROM " + getEntityClass().getSimpleName() + " e WHERE e.name = :value",
                                 getEntityClass())
@@ -24,12 +26,12 @@ public class DAOCardProperties<T extends CardProperties, ID extends Serializable
     }
 
     public List<T> findAllByName(Set<String> names) throws MylException {
-        return HibernateUtil.withSession(session ->
+        return HibernateUtil.withTransaction((Function<Session, List<T>>) session ->
                 session.createQuery(
-                                "FROM " + getEntityClass().getSimpleName() + " e WHERE e.name IN :names",      // ① use IN :names
+                                "FROM " + getEntityClass().getSimpleName() + " e WHERE e.name IN :names",
                                 getEntityClass())
-                        .setParameter("names", names)              // ② bind the List<String>
-                        .getResultList()                           // ③ return a List<T>
+                        .setParameter("names", names)
+                        .getResultList()                                    // return a List<T>
         );
     }
 }

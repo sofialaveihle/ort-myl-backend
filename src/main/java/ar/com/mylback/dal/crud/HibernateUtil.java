@@ -56,6 +56,7 @@ public class HibernateUtil {
             return result;
         } catch (HibernateException e) {
             if (tx != null) tx.rollback();
+            System.err.println(e.getMessage());
             throw new MylException(MylException.Type.ERROR_DB_TRANSACTION, e.getMessage());
         }
     }
@@ -64,6 +65,7 @@ public class HibernateUtil {
         try (Session session = openSession()) {
             return work.apply(session);
         } catch (HibernateException e) {
+            System.err.println(e.getMessage());
             throw new MylException(MylException.Type.ERROR_DB_TRANSACTION, e.getMessage());
         }
     }

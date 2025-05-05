@@ -142,4 +142,24 @@ public class Card extends CardProperties {
     public void setKeyWords(Set<KeyWord> keyWords) {
         this.keyWords = keyWords;
     }
+
+    @Override
+    public String toString() {
+        return "Card{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", imageUuid=" + imageUuid +
+                ", description='" + description + '\'' +
+                ", cost=" + cost +
+                ", damage=" + damage +
+                ", collection=" + collection +
+                ", rarity=" + rarity +
+                ", type=" + type +
+                ", race=" + race +
+                ", formats=" + formats +
+                ", keyWords=" + keyWords +
+                ", id=" + id +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

@@ -18,7 +18,7 @@ public class LoadDataBase {
     private static final Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
-        String resourcePath = "/cards.json"; // Example path
+        String resourcePath = "/cards.json";
 
         try (
                 // Get the InputStream for the resource from the classpath
