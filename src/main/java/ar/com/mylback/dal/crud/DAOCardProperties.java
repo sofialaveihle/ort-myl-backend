@@ -1,6 +1,6 @@
 package ar.com.mylback.dal.crud;
 
-import ar.com.mylback.MylException;
+import ar.com.mylback.utils.MylException;
 import ar.com.mylback.dal.entities.CardProperties;
 import org.hibernate.Session;
 

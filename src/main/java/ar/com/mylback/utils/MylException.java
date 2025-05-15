@@ -1,4 +1,4 @@
-package ar.com.mylback;
+package ar.com.mylback.utils;
 
 public class MylException extends Exception {
     private final Type type;
