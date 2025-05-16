@@ -1,13 +1,11 @@
 package ar.com.test.loaddata;
 
 import com.luciad.imageio.webp.WebPWriteParam;
+import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
-import software.amazon.awssdk.services.s3.model.DeleteObjectResponse;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectResponse;
+import software.amazon.awssdk.services.s3.model.*;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
@@ -90,11 +88,11 @@ public class ImageProcessor {
         }
     }
 
-    public boolean imageUpload(byte[] imageData, UUID imageUUID, ar.com.mylback.dal.entities.Card card) {
+    public boolean imageUpload(byte[] imageData, UUID imageUUID) {
         try {
             String imageKey = AWS_FOLDER + imageUUID.toString() + ".webp";
             PutObjectRequest putObjectRequest = baseRequestBuilder.key(imageKey).build();
-
+            GetObjectRequest getObjectRequest;
 
 //            TODO uncomment to send image to aws
             PutObjectResponse response = s3Client.putObject(putObjectRequest, RequestBody.fromBytes(imageData));
@@ -129,6 +127,25 @@ public class ImageProcessor {
             return true;
         } else {
             System.err.printf("Delete returned error (HTTP %d)%n", deleteStatusCode);
+            return false;
+        }
+    }
+
+    public boolean imageExists(UUID imageUUID) {
+        try {
+            String imageKey = AWS_FOLDER + imageUUID.toString() + ".webp";
+
+            HeadObjectRequest headObjectRequest = HeadObjectRequest.builder()
+                    .bucket(BUCKET_NAME)
+                    .key(imageKey)
+                    .build();
+            s3Client.headObject(headObjectRequest);
+            return true; // If headObject doesn't throw an exception, the object exists
+        } catch (NoSuchKeyException e) {
+            return false; // Object not found
+        } catch (S3Exception | SdkClientException e) {
+            // Handle other S3 exceptions (e.g., network issues, invalid credentials)
+            System.err.println("Error checking file existence: " + e.getMessage());
             return false;
         }
     }

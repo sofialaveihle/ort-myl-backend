@@ -1,6 +1,6 @@
 package ar.com.test.loaddata;
 
-import ar.com.mylback.MylException;
+import ar.com.mylback.utils.MylException;
 import ar.com.mylback.dal.crud.DAOCardProperties;
 import ar.com.mylback.dal.entities.CardProperties;
 import ar.com.test.loaddata.models.*;
@@ -58,8 +58,10 @@ public class MapToEntities {
 
                 entityCard.setImageUuid(UUID.randomUUID());
 
-                // set the list of objects to the card
-                cardsEntities.add(entityCard);
+
+                if (entityCard.getCollection() != null) {
+                    cardsEntities.add(entityCard);
+                }
             }
         }
         return cardsEntities;

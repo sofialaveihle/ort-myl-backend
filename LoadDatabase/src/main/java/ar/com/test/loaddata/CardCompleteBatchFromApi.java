@@ -8,8 +8,6 @@ import com.google.gson.Gson;
 import okhttp3.*;
 import com.google.common.util.concurrent.RateLimiter;
 
-
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -17,8 +15,8 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class CardCompleteBatchFromApi {
-    private static final int THREADS = 5;
-    private static final int MAX_RETRIES = 3;
+    private static final int THREADS = 4;
+    private static final int MAX_RETRIES = 4;
     private static final long BACKOFF_MS = 1000;
     private static final RateLimiter rateLimiter = RateLimiter.create(5.0);
 
@@ -47,32 +45,35 @@ public class CardCompleteBatchFromApi {
                 completion.submit(() -> {
                     boolean success = false;
                     for (int attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+                        String cardDetailsJson = null;
                         try {
-                            String cardDetailsJson = getDataFromTheApi(card.getEd_slug(), card.getSlug());
+                            cardDetailsJson = getDataFromTheApi(card.getEd_slug(), card.getSlug());
 
-                            if (cardDetailsJson != null) {
-                                CardDetails cardDetails = gson.fromJson(cardDetailsJson, CardDetails.class);
+                            CardDetails cardDetails = gson.fromJson(cardDetailsJson, CardDetails.class);
 
-                                if (cardDetails != null) {
-                                    if (cardDetails.getValid_formats() != null) {
-                                        card.setFormats(cardDetails.getValid_formats());
-                                    } else {
-                                        throw new Exception("error getting valid formats");
-                                    }
-                                    if (cardDetails.getEdition() != null) {
-                                        collections.add(cardDetails.getEdition());
-                                    } else {
-                                        throw new Exception("error collecting edition");
-                                    }
-                                    success = true;
+                            if (cardDetails != null) {
+                                if (cardDetails.getValid_formats() != null) {
+                                    card.setFormats(cardDetails.getValid_formats());
                                 } else {
-                                    throw new Exception("Error json parsing");
+                                    attempt = MAX_RETRIES + 1;
+                                    throw new Exception("Error getting valid formats");
                                 }
+                                if (cardDetails.getEdition() != null) {
+                                    collections.add(cardDetails.getEdition());
+                                } else {
+                                    throw new Exception("Error collecting edition");
+                                }
+                                success = true;
                             } else {
-                                throw new Exception("Empty json from api or error response");
+                                throw new Exception("Error json parsing");
                             }
+                        } catch (Exception400 mylException) {
+                            attempt = MAX_RETRIES + 1; // if 400 error code not retry
+                            System.err.printf("\nCard %s error 400 getting from: %s", card.getName(), mylException.getMessage());
+                            System.err.println("request response: " + cardDetailsJson);
                         } catch (Exception e) {
-                            System.err.printf("Card %s: API attempt %d/%d failed: %s%n", card.getName(), attempt, MAX_RETRIES, e.getMessage());
+                            System.err.printf("\nCard %s: API attempt %d/%d failed: %s%n", card.getName(), attempt, MAX_RETRIES, e.getMessage());
+                            System.err.println("request response: " + cardDetailsJson);
                             Thread.sleep(BACKOFF_MS * attempt);
                         }
                     }
@@ -105,7 +106,7 @@ public class CardCompleteBatchFromApi {
         }
     }
 
-    private static String getDataFromTheApi(String editionSlug, String cardSlug) throws Exception {
+    public static String getDataFromTheApi(String editionSlug, String cardSlug) throws Exception {
         HttpUrl url = new HttpUrl.Builder()
                 .scheme("https")
                 .host("api.myl.cl")
@@ -129,7 +130,11 @@ public class CardCompleteBatchFromApi {
 
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful() || response.body() == null) {
-                throw new IOException("Unexpected HTTP "
+                int code = response.code();
+                if (code >= 400 && code < 500) {
+                    throw new Exception400(url.toString());
+                }
+                throw new Exception("Unexpected HTTP "
                         + response.code() + " "
                         + response.message()
                         + " from " + url);

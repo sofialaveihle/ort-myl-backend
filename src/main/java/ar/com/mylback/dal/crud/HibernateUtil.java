@@ -1,6 +1,6 @@
 package ar.com.mylback.dal.crud;
 
-import ar.com.mylback.MylException;
+import ar.com.mylback.utils.MylException;
 import ar.com.mylback.dal.entities.*;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -56,6 +56,7 @@ public class HibernateUtil {
             return result;
         } catch (HibernateException e) {
             if (tx != null) tx.rollback();
+            System.err.println(e.getMessage());
             throw new MylException(MylException.Type.ERROR_DB_TRANSACTION, e.getMessage());
         }
     }
@@ -64,6 +65,7 @@ public class HibernateUtil {
         try (Session session = openSession()) {
             return work.apply(session);
         } catch (HibernateException e) {
+            System.err.println(e.getMessage());
             throw new MylException(MylException.Type.ERROR_DB_TRANSACTION, e.getMessage());
         }
     }

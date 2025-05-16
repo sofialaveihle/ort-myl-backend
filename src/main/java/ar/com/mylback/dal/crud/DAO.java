@@ -1,7 +1,8 @@
 package ar.com.mylback.dal.crud;
 
-import ar.com.mylback.MylException;
+import ar.com.mylback.utils.MylException;
 import org.hibernate.Session;
+import org.hibernate.exception.ConstraintViolationException;
 
 import java.io.Serializable;
 import java.util.List;
@@ -16,7 +17,7 @@ public class DAO<T, ID extends Serializable> {
     }
 
     public T findById(ID id) throws MylException {
-        return HibernateUtil.withSession(session -> session.get(entityClass, id));
+        return HibernateUtil.withTransaction((Function<Session, T>) session -> session.get(entityClass, id));
     }
 
     public void save(T entity) throws MylException {
@@ -25,14 +26,24 @@ public class DAO<T, ID extends Serializable> {
 
     public void save(List<T> entities) throws MylException {
         HibernateUtil.withTransaction(session -> {
-            entities.forEach(session::persist);
+            for (T entity : entities) {
+                try {
+                    session.persist(entity);
+                } catch (ConstraintViolationException e) {
+                    System.err.println("Error: Duplicate entry found for entity: " + entity + "\n" + e.getMessage());
+                }
+            }
         });
     }
 
     public void saveMerge(List<T> entities) throws MylException {
         HibernateUtil.withTransaction(session -> {
             for (T entity : entities) {
-                session.merge(entity);
+                try {
+                    session.persist(entity);
+                } catch (ConstraintViolationException e) {
+                    System.err.println("Error: Duplicate entry found for entity: " + entity + "\n" + e.getMessage());
+                }
             }
         });
     }
