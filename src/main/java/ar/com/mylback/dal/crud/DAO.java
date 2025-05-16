@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class DAO<T, ID extends Serializable> {
-    private final Class<T> entityClass;
+    protected final Class<T> entityClass;
 
     public DAO(Class<T> entityClass) {
         this.entityClass = entityClass;
@@ -54,9 +54,5 @@ public class DAO<T, ID extends Serializable> {
 
     public void delete(T entity) throws MylException {
         HibernateUtil.withTransaction((Consumer<Session>) session -> session.remove(entity));
-    }
-
-    protected Class<T> getEntityClass() {
-        return entityClass;
     }
 }

@@ -18,8 +18,7 @@ public class DAOCardProperties<T extends CardProperties, ID extends Serializable
     public T findByName(String value) throws MylException {
         return HibernateUtil.withTransaction((Function<Session, T>) session ->
                 session.createQuery(
-                                "FROM " + getEntityClass().getSimpleName() + " e WHERE e.name = :value",
-                                getEntityClass())
+                                "FROM " + entityClass.getSimpleName() + " e WHERE e.name = :value", entityClass)
                         .setParameter("value", value)
                         .uniqueResult()
         );
@@ -28,8 +27,7 @@ public class DAOCardProperties<T extends CardProperties, ID extends Serializable
     public List<T> findAllByName(Set<String> names) throws MylException {
         return HibernateUtil.withTransaction((Function<Session, List<T>>) session ->
                 session.createQuery(
-                                "FROM " + getEntityClass().getSimpleName() + " e WHERE e.name IN :names",
-                                getEntityClass())
+                                "FROM " + entityClass.getSimpleName() + " e WHERE e.name IN :names", entityClass)
                         .setParameter("names", names)
                         .getResultList()                                    // return a List<T>
         );

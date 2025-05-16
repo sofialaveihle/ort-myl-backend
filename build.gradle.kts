@@ -20,6 +20,8 @@ dependencies {
     implementation("com.zaxxer:HikariCP:5.0.1")
 
     implementation("jakarta.persistence:jakarta.persistence-api:3.1.0")
+    implementation("jakarta.validation:jakarta.validation-api:3.0.2")
+
     implementation("org.hibernate:hibernate-hikaricp:6.6.13.Final")
     implementation("ch.qos.logback:logback-classic:1.5.13")
 
@@ -29,6 +31,8 @@ dependencies {
     runtimeOnly("com.mysql:mysql-connector-j:9.2.0")
 
     implementation("software.amazon.awssdk:s3:2.25.20")
+
+    implementation(project(":MyLDTOs"))
 
     // It's also highly recommended to include a logging implementation
     // SLF4J is the standard facade, Logback or Log4j2 are common implementations
