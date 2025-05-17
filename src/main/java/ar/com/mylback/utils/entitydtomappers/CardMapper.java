@@ -2,7 +2,7 @@ package ar.com.mylback.utils.entitydtomappers;
 
 import ar.com.mylback.dal.entities.Card;
 import jakarta.validation.constraints.NotNull;
-import myldtos.cards.CardDTO;
+import ar.com.myldtos.cards.CardDTO;
 
 public class CardMapper {
     @NotNull

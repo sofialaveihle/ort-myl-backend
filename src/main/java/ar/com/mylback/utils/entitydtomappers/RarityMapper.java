@@ -1,7 +1,7 @@
 package ar.com.mylback.utils.entitydtomappers;
 
 import ar.com.mylback.dal.entities.Rarity;
-import myldtos.cards.RarityDTO;
+import ar.com.myldtos.cards.RarityDTO;
 
 public class RarityMapper {
     public static RarityDTO toDTO(Rarity rarity) {

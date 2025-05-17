@@ -1,7 +1,7 @@
 package ar.com.mylback.utils.entitydtomappers;
 
 import ar.com.mylback.dal.entities.Format;
-import myldtos.cards.FormatDTO;
+import ar.com.myldtos.cards.FormatDTO;
 
 import java.util.ArrayList;
 import java.util.List;

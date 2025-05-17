@@ -5,7 +5,7 @@ import ar.com.mylback.dal.entities.Card;
 import ar.com.mylback.utils.QueryString;
 import ar.com.mylback.utils.entitydtomappers.CardMapper;
 import com.google.gson.Gson;
-import myldtos.cards.CardDTO;
+import ar.com.myldtos.cards.CardDTO;
 
 import java.util.List;
 
