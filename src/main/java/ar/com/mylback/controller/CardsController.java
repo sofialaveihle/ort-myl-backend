@@ -2,6 +2,7 @@ package ar.com.mylback.controller;
 
 import ar.com.mylback.dal.crud.DAOCard;
 import ar.com.mylback.dal.entities.Card;
+import ar.com.mylback.utils.ImageUrlGenerator;
 import ar.com.mylback.utils.QueryString;
 import ar.com.mylback.utils.entitydtomappers.CardMapper;
 import com.google.gson.Gson;
@@ -20,6 +21,7 @@ public class CardsController {
                 .map(CardMapper::toDTO)
                 .toList();
 
+        ImageUrlGenerator.getInstance().close();
         Gson gson = new Gson();
         return gson.toJson(cardDTOs);
     }
