@@ -3,10 +3,7 @@ package ar.com.mylback.utils;
 import jakarta.validation.constraints.NotNull;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class QueryString {
     private final Map<String, List<String>> query;
@@ -32,7 +29,6 @@ public class QueryString {
                     String key = decode(keyValue[0]);
                     String value = decode(keyValue[1]);
                     queryParams.computeIfAbsent(key, v -> new ArrayList<>()).add(value);
-
                 }
             }
         }
@@ -40,7 +36,7 @@ public class QueryString {
     }
 
     @NotNull
-    public List<String> getValues(String key) {
+    private List<String> getValues(String key) {
         List<String> values = query.get(key);
         if (values == null) {
             values = new ArrayList<>();
@@ -50,17 +46,76 @@ public class QueryString {
 
     public int getPage() {
         List<String> values = getValues("page");
-        if (values == null || values.isEmpty()) {
+        if (values.isEmpty()) {
             return 0;
         }
-        return Integer.parseInt(values.get(0));
+        return Math.max(Integer.parseInt(values.get(0)), 1);
     }
 
     public int getPageSize() {
         List<String> values = getValues("pageSize");
-        if (values == null || values.isEmpty()) {
+        if (values.isEmpty()) {
             return 0;
         }
-        return Integer.parseInt(values.get(0));
+        return Math.max(Integer.parseInt(values.get(0)), 1);
+    }
+
+    public List<Integer> getCosts() {
+        return getValues("cost").stream()
+                .filter(e -> e != null && !e.isEmpty())
+                .map(e -> {
+                    try {
+                        return Integer.parseInt(e);
+                    } catch (NumberFormatException ex) {
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    public List<Integer> getDamages() {
+        return getValues("damage").stream()
+                .filter(e -> e != null && !e.isEmpty())
+                .map(e -> {
+                    try {
+                        return Integer.parseInt(e);
+                    } catch (NumberFormatException ex) {
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    public List<String> getCollections() {
+        return getValues("collection").stream()
+                .filter(e -> e != null && !e.isEmpty()).toList();
+    }
+
+    public List<String> getRarities() {
+        return getValues("rarity").stream()
+                .filter(e -> e != null && !e.isEmpty()).toList();
+    }
+
+
+    public List<String> getTypes() {
+        return getValues("type").stream()
+                .filter(e -> e != null && !e.isEmpty()).toList();
+    }
+
+    public List<String> getDescriptions() {
+        return getValues("race").stream()
+                .filter(e -> e != null && !e.isEmpty()).toList();
+    }
+
+    public List<String> getFormats() {
+        return getValues("format").stream()
+                .filter(e -> e != null && !e.isEmpty()).toList();
+    }
+
+    public List<String> getKeyWords() {
+        return getValues("keyWord").stream()
+                .filter(e -> e != null && !e.isEmpty()).toList();
     }
 }

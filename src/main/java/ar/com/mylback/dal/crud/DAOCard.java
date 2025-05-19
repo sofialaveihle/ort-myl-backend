@@ -36,19 +36,27 @@ public class DAOCard<ID extends Serializable> extends DAO<Card, ID> {
 
     public List<Card> findAllPaged(int pageNumber, int pageSize) throws MylException {
         return HibernateUtil.withSession(session -> {
-            Query<Card> query = session.createQuery("FROM Card c", Card.class);
+            // Page IDs
+            List<Integer> ids = session.createQuery(
+                            "SELECT c.id FROM Card c ORDER BY c.id", Integer.class)
+                    .setFirstResult((pageNumber - 1) * pageSize)
+                    .setMaxResults(pageSize)
+                    .getResultList();
 
-
-            query.setFirstResult((pageNumber - 1) * pageSize);
-            query.setMaxResults(pageSize);
-            List<Card> cards = query.getResultList();
-
-            for (Card card : cards) {
-                Hibernate.initialize(card.getFormats());
-                Hibernate.initialize(card.getKeyWords());
-            }
-
-            return query.getResultList();
+            // Fetch entities + associations
+            return session.createQuery("""
+                        SELECT DISTINCT c FROM Card c
+                        LEFT JOIN FETCH c.collection
+                        LEFT JOIN FETCH c.race
+                        LEFT JOIN FETCH c.rarity
+                        LEFT JOIN FETCH c.type
+                        LEFT JOIN FETCH c.formats
+                        LEFT JOIN FETCH c.keyWords
+                        WHERE c.id IN :ids
+                        ORDER BY c.id
+                    """, Card.class)
+                        .setParameter("ids", ids)
+                        .getResultList();
         });
     }
 }
