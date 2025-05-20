@@ -10,4 +10,13 @@ public class CardPropertiesMapper {
             cardPropertiesDTO.setName(cardProperties.getName());
         }
     }
+
+    public static CardPropertiesDTO toDTO(CardProperties cardProperties) {
+        CardPropertiesDTO cardPropertiesDTO = new CardPropertiesDTO();
+        if (cardProperties != null) {
+            cardPropertiesDTO.setId(cardProperties.getId());
+            cardPropertiesDTO.setName(cardProperties.getName());
+        }
+        return cardPropertiesDTO;
+    }
 }
