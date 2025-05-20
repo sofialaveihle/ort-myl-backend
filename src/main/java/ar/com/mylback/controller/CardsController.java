@@ -15,7 +15,16 @@ public class CardsController {
     public String getCardsEndpoint(QueryString queryString) throws Exception {
         // get cards from DB
         DAOCard<Integer> daoCard = new DAOCard<>();
-        List<Card> cards = daoCard.findAllPaged(queryString.getPage(), queryString.getPageSize());
+        List<Card> cards = daoCard.findAllPaged(queryString.getPage(),
+                queryString.getPageSize(),
+                queryString.getCosts(),
+                queryString.getDamages(),
+                queryString.getCollectionsIds(),
+                queryString.getRaritiesIds(),
+                queryString.getTypesIds(),
+                queryString.getRacesIds(),
+                queryString.getFormatsIds(),
+                queryString.getKeyWordsIds());
 
         List<CardDTO> cardDTOs = cards.stream()
                 .map(CardMapper::toDTO)

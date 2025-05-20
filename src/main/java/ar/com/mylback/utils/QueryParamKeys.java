@@ -1,0 +1,24 @@
+package ar.com.mylback.utils;
+
+public enum QueryParamKeys {
+    PAGE("page"),
+    PAGE_SIZE("pageSize"),
+    COST("cost"),
+    DAMAGE("damage"),
+    COLLECTION_ID("collectionId"),
+    RARITY_ID("rarityId"),
+    TYPE_ID("typeId"),
+    RACE_ID("raceId"),
+    FORMAT_ID("formatId"),
+    KEY_WORD_ID("keyWordId");
+
+    private final String key;
+
+    QueryParamKeys(String key) {
+        this.key = key;
+    }
+
+    public String key() {
+        return key;
+    }
+}
