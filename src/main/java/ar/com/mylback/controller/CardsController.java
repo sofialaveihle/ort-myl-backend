@@ -15,7 +15,7 @@ public class CardsController {
     public String getCardsEndpoint(QueryString queryString) throws Exception {
         // get cards from DB
         DAOCard<Integer> daoCard = new DAOCard<>();
-        List<Card> cards = daoCard.findAllPaged(queryString.getPage(),
+        List<Card> cards = daoCard.findAllPagedFiltered(queryString.getPage(),
                 queryString.getPageSize(),
                 queryString.getCosts(),
                 queryString.getDamages(),
@@ -24,8 +24,30 @@ public class CardsController {
                 queryString.getTypesIds(),
                 queryString.getRacesIds(),
                 queryString.getFormatsIds(),
-                queryString.getKeyWordsIds());
+                queryString.getKeyWordsIds(),
+                List.of());
 
+        return getCardsFromList(cards);
+    }
+
+    public String getCardsByName(QueryString queryString) throws Exception {
+        DAOCard<Integer> daoCard = new DAOCard<>();
+
+        List<Card> cards = daoCard.findAllPagedFiltered(queryString.getPage(), queryString.getPageSize(),
+                List.of(),
+                List.of(),
+                List.of(),
+                List.of(),
+                List.of(),
+                List.of(),
+                List.of(),
+                List.of(),
+                queryString.getNames());
+
+        return getCardsFromList(cards);
+    }
+
+    private String getCardsFromList(List<Card> cards) {
         List<CardDTO> cardDTOs = cards.stream()
                 .map(CardMapper::toDTO)
                 .toList();
@@ -33,5 +55,15 @@ public class CardsController {
         ImageUrlGenerator.getInstance().close();
         Gson gson = new Gson();
         return gson.toJson(cardDTOs);
+    }
+
+    public String getCardByIDEndpoint(int id) throws Exception {
+        DAOCard<Integer> daoCard = new DAOCard<>();
+
+        CardDTO cardDTO = CardMapper.toDTO(daoCard.findById(id));
+
+        ImageUrlGenerator.getInstance().close();
+        Gson gson = new Gson();
+        return gson.toJson(cardDTO);
     }
 }

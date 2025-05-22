@@ -3,6 +3,7 @@ package ar.com.mylback.utils;
 public enum QueryParamKeys {
     PAGE("page"),
     PAGE_SIZE("pageSize"),
+    NAME("name"),
     COST("cost"),
     DAMAGE("damage"),
     COLLECTION_ID("collectionId"),

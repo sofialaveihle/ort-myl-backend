@@ -9,7 +9,7 @@ import com.google.gson.Gson;
 import java.util.List;
 
 public class CardPropertiesController<T extends CardProperties> {
-    public String getAll(Class<T> entityClass) throws Exception {
+    public String getAllEndpoint(Class<T> entityClass) throws Exception {
         DAOCardProperties<T, Integer> daoCardProperties = new DAOCardProperties<>(entityClass);
         List<T> cardPropertiesList = daoCardProperties.findAll();
 

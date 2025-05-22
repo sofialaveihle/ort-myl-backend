@@ -26,13 +26,19 @@ public class QueryString {
     private Map<String, List<String>> parse(String query) {
         Map<String, List<String>> queryParams = new HashMap<>();
         if (query != null && !query.isEmpty()) {
-            for (String pair : query.split("&")) {
-                String[] keyValue = pair.split("=");
-                if (keyValue.length == 2) {
-                    String key = decode(keyValue[0]);
-                    String value = decode(keyValue[1]);
-                    queryParams.computeIfAbsent(key, v -> new ArrayList<>()).add(value);
+            try {
+                for (String pair : query.split("&")) {
+                    try {
+                        String[] keyValue = pair.split("=", 2);
+                        String key = decode(keyValue[0]);
+                        String value = keyValue.length > 1 ? decode(keyValue[1]) : "";
+                        queryParams.computeIfAbsent(key, v -> new ArrayList<>()).add(value);
+                    } catch (Exception e) {
+                        System.err.println("Error parsing query key value: " + e.getMessage());
+                    }
                 }
+            } catch (Exception e) {
+                System.err.println("Error parsing query string: " + e.getMessage());
             }
         }
         return queryParams;
@@ -60,6 +66,11 @@ public class QueryString {
                 })
                 .filter(Objects::nonNull)
                 .toList();
+    }
+
+    @NotNull
+    public List<String> getNames() {
+        return getValues(QueryParamKeys.NAME.key());
     }
 
     public int getPage() {
