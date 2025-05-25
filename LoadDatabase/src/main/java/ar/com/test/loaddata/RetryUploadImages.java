@@ -36,7 +36,7 @@ public class RetryUploadImages {
                 CardsData cardsData = gson.fromJson(reader, CardsData.class);
 
                 // get all the cards from the DB
-                DAOCard<ar.com.mylback.dal.entities.Card, Integer> cardDAO = new DAOCard<>(ar.com.mylback.dal.entities.Card.class);
+                DAOCard<Integer> cardDAO = new DAOCard<>();
                 List<Card> entityCards = cardDAO.getAllCardsWithCollections();
 
                 ImageBatchUploader.loadImagesFromCardsInDataBase(cardsData, entityCards);
