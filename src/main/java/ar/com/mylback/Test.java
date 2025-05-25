@@ -8,7 +8,7 @@ import org.hibernate.cfg.Configuration;
 import java.util.UUID;
 
 public class Test {
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         System.out.println(Runtime.version());
         SessionFactory sessionFactory = new Configuration()
                 .configure("hibernate.cfg.xml")
@@ -85,5 +85,5 @@ public class Test {
             session.close();
             sessionFactory.close();
         }
-    }
+    }*/
 }

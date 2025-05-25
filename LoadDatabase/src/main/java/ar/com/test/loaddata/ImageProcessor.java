@@ -92,7 +92,6 @@ public class ImageProcessor {
         try {
             String imageKey = AWS_FOLDER + imageUUID.toString() + ".webp";
             PutObjectRequest putObjectRequest = baseRequestBuilder.key(imageKey).build();
-            GetObjectRequest getObjectRequest;
 
 //            TODO uncomment to send image to aws
             PutObjectResponse response = s3Client.putObject(putObjectRequest, RequestBody.fromBytes(imageData));

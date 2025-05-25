@@ -1,7 +1,7 @@
 package ar.com.mylback.utils.entitydtomappers;
 
 import ar.com.mylback.dal.entities.Collection;
-import myldtos.cards.CollectionDTO;
+import ar.com.myldtos.cards.CollectionDTO;
 
 public class CollectionMapper {
     public static CollectionDTO toDTO(Collection collection) {

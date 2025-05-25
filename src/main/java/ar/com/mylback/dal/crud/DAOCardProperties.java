@@ -32,4 +32,10 @@ public class DAOCardProperties<T extends CardProperties, ID extends Serializable
                         .getResultList()                                    // return a List<T>
         );
     }
+
+    public List<T> findAll() throws MylException {
+        return HibernateUtil.withTransaction((Function<Session, List<T>>) session ->
+                session.createQuery("FROM " + entityClass.getSimpleName() + " e ORDER BY e.id", entityClass).getResultList()
+        );
+    }
 }

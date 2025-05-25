@@ -5,8 +5,10 @@ plugins {
 group = "org.example"
 version = "1.0-SNAPSHOT"
 
-repositories {
-    mavenCentral()
+allprojects {
+    repositories {
+        mavenCentral()
+    }
 }
 
 java {
@@ -32,7 +34,7 @@ dependencies {
 
     implementation("software.amazon.awssdk:s3:2.25.20")
 
-    implementation(project(":MyLDTOs"))
+    implementation(project(":ort-myl-dtos"))
 
     // It's also highly recommended to include a logging implementation
     // SLF4J is the standard facade, Logback or Log4j2 are common implementations

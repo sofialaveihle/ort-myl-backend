@@ -1,7 +1,7 @@
 package ar.com.mylback.utils.entitydtomappers;
 
 import ar.com.mylback.dal.entities.KeyWord;
-import myldtos.cards.KeyWordDTO;
+import ar.com.myldtos.cards.KeyWordDTO;
 
 import java.util.ArrayList;
 import java.util.List;

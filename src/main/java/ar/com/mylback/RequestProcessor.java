@@ -1,5 +1,7 @@
 package ar.com.mylback;
 
+import ar.com.mylback.controller.CardPropertiesController;
+import ar.com.mylback.dal.entities.*;
 import ar.com.mylback.utils.MylException;
 import ar.com.mylback.controller.CardsController;
 import ar.com.mylback.utils.QueryString;
@@ -42,7 +44,76 @@ public class RequestProcessor implements Runnable {
                             String response = controller.getCardsEndpoint(queryString);
                             sendResponse(exchange, 200, response);
                         } catch (Exception e) {
-                            sendResponse(exchange, 500, "Error parser");
+                            sendResponse(exchange, 500, "Error parser cards: " + e.getMessage());
+                        }
+                    } else if (path.matches("/api/card/\\d+")) {
+                        try {
+                            String[] parts = path.split("/");
+                            if (parts.length >= 4) {
+                                CardsController controller = new CardsController();
+                                String response = controller.getCardByIDEndpoint(Integer.parseInt(parts[3]));
+                                sendResponse(exchange, 200, response);
+                            } else {
+                                sendResponse(exchange, 500, "Error parsing url");
+                            }
+                        } catch (Exception e) {
+                            sendResponse(exchange, 500, "Error getting card: " + e.getMessage());
+                        }
+                    } else if (path.equals("/api/card/search")) {
+                        try {
+                            CardsController controller = new CardsController();
+                            String response = controller.getCardsByName(queryString);
+                            sendResponse(exchange, 200, response);
+                        } catch (Exception e) {
+                            sendResponse(exchange, 500, "Error parser cards: " + e.getMessage());
+                        }
+                    } else if (path.equals("/api/collections")) {
+                        try {
+                            CardPropertiesController<Collection> controller = new CardPropertiesController<>();
+                            String response = controller.getAllEndpoint(Collection.class);
+                            sendResponse(exchange, 200, response);
+                        } catch (Exception e) {
+                            sendResponse(exchange, 500, "Error parser collections: " + e.getMessage());
+                        }
+                    } else if (path.equals("/api/rarities")) {
+                        try {
+                            CardPropertiesController<Rarity> controller = new CardPropertiesController<>();
+                            String response = controller.getAllEndpoint(Rarity.class);
+                            sendResponse(exchange, 200, response);
+                        } catch (Exception e) {
+                            sendResponse(exchange, 500, "Error parser rarities: " + e.getMessage());
+                        }
+                    } else if (path.equals("/api/types")) {
+                        try {
+                            CardPropertiesController<Type> controller = new CardPropertiesController<>();
+                            String response = controller.getAllEndpoint(Type.class);
+                            sendResponse(exchange, 200, response);
+                        } catch (Exception e) {
+                            sendResponse(exchange, 500, "Error parser types: " + e.getMessage());
+                        }
+                    } else if (path.equals("/api/races")) {
+                        try {
+                            CardPropertiesController<Race> controller = new CardPropertiesController<>();
+                            String response = controller.getAllEndpoint(Race.class);
+                            sendResponse(exchange, 200, response);
+                        } catch (Exception e) {
+                            sendResponse(exchange, 500, "Error parser races: " + e.getMessage());
+                        }
+                    } else if (path.equals("/api/formats")) {
+                        try {
+                            CardPropertiesController<Format> controller = new CardPropertiesController<>();
+                            String response = controller.getAllEndpoint(Format.class);
+                            sendResponse(exchange, 200, response);
+                        } catch (Exception e) {
+                            sendResponse(exchange, 500, "Error parser formats: " + e.getMessage());
+                        }
+                    } else if (path.equals("/api/keywords")) {
+                        try {
+                            CardPropertiesController<KeyWord> controller = new CardPropertiesController<>();
+                            String response = controller.getAllEndpoint(KeyWord.class);
+                            sendResponse(exchange, 200, response);
+                        } catch (Exception e) {
+                            sendResponse(exchange, 500, "Error parser keywords: " + e.getMessage());
                         }
                     } else {
                         sendResponse(exchange, 404, "404 Not Found");
@@ -53,7 +124,7 @@ public class RequestProcessor implements Runnable {
 
 
             } catch (Exception e) {
-                e.printStackTrace();
+                System.err.println(e.getMessage());
             }
         }
     }
@@ -68,10 +139,8 @@ public class RequestProcessor implements Runnable {
 
     private void sendResponse(HttpExchange exchange, int status, String body) throws IOException {
         exchange.sendResponseHeaders(status, body.getBytes().length);
-        try (OutputStream os = exchange.getResponseBody()) {
+        try (exchange; OutputStream os = exchange.getResponseBody()) {
             os.write(body.getBytes());
-        } finally {
-            exchange.close();
         }
     }
 }

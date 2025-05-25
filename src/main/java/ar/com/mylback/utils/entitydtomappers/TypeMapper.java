@@ -1,7 +1,7 @@
 package ar.com.mylback.utils.entitydtomappers;
 
 import ar.com.mylback.dal.entities.Type;
-import myldtos.cards.TypeDTO;
+import ar.com.myldtos.cards.TypeDTO;
 
 public class TypeMapper {
     public static TypeDTO toDTO(Type type) {
