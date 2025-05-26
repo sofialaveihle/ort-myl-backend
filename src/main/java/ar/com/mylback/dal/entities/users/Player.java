@@ -18,4 +18,20 @@ public class Player extends User {
 
     @OneToMany(mappedBy = "player", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<PlayerCard> playerCards = new HashSet<>();
+
+    public Set<Deck> getDecks() {
+        return decks;
+    }
+
+    public void setDecks(Set<Deck> decks) {
+        this.decks = decks;
+    }
+
+    public Set<PlayerCard> getPlayerCards() {
+        return playerCards;
+    }
+
+    public void setPlayerCards(Set<PlayerCard> playerCards) {
+        this.playerCards = playerCards;
+    }
 }

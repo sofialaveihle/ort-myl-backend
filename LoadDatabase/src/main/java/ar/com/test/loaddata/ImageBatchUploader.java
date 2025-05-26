@@ -1,7 +1,7 @@
 package ar.com.test.loaddata;
 
 import ar.com.mylback.utils.MylException;
-import ar.com.mylback.dal.crud.DAOCardProperties;
+import ar.com.mylback.dal.crud.cards.DAOCardProperties;
 import ar.com.test.loaddata.models.Card;
 import ar.com.test.loaddata.models.CardDetails;
 import ar.com.test.loaddata.models.CardsData;

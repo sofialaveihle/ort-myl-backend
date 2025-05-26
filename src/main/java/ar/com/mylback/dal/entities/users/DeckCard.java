@@ -9,10 +9,10 @@ public class DeckCard {
     @EmbeddedId
     private DeckCardId id;
 
-    @ManyToOne
-    @MapsId("deckId")
-    @JoinColumn(name = "deck_id")
-    private Deck deck;
+//    @ManyToOne
+//    @MapsId("deckId")
+//    @JoinColumn(name = "deck_id")
+//    private Deck deck;
 
     @ManyToOne
     @MapsId("cardId")
@@ -20,5 +20,29 @@ public class DeckCard {
     private Card card;
 
     @Column(nullable = false)
-    private int quantity;
+    private Integer quantity;
+
+    public DeckCardId getId() {
+        return id;
+    }
+
+    public void setId(DeckCardId id) {
+        this.id = id;
+    }
+
+    public Card getCard() {
+        return card;
+    }
+
+    public void setCard(Card card) {
+        this.card = card;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
 }
