@@ -1,4 +1,4 @@
-package ar.com.mylback.dal.entities;
+package ar.com.mylback.dal.entities.cards;
 
 import jakarta.persistence.*;
 
@@ -6,21 +6,20 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "races")
+@Table(name = "formats")
 @AttributeOverrides({
         @AttributeOverride(name = "id",
-                column = @Column(name = "race_id")
+                column = @Column(name = "format_id")
         ),
         @AttributeOverride(name = "name",
-                column = @Column(name = "race_name", length = 50)
+                column = @Column(name = "format_name", length = 100)
         )
 })
-public class Race extends CardProperties {
-    @OneToMany(mappedBy = "race", cascade = CascadeType.ALL, orphanRemoval = true)
+public class Format extends CardProperties {
+    @ManyToMany(mappedBy = "formats")
     private Set<Card> cards = new HashSet<>();
 
-    public Race() {
-    }
+    public Format() {}
 
     public Set<Card> getCards() {
         return cards;

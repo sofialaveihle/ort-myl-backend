@@ -1,7 +1,7 @@
 package ar.com.test.loaddata;
 
 import ar.com.mylback.dal.crud.DAOCard;
-import ar.com.mylback.dal.entities.Card;
+import ar.com.mylback.dal.entities.cards.Card;
 import ar.com.test.loaddata.deserializers.CardsDataDeserializer;
 import ar.com.test.loaddata.models.CardsData;
 import com.google.gson.Gson;
@@ -12,7 +12,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.UUID;
 
 public class RetryUploadImages {
     public static void main(String[] args) {

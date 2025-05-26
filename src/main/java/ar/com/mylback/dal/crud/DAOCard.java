@@ -1,6 +1,6 @@
 package ar.com.mylback.dal.crud;
 
-import ar.com.mylback.dal.entities.Card;
+import ar.com.mylback.dal.entities.cards.Card;
 import ar.com.mylback.utils.MylException;
 import jakarta.persistence.TypedQuery;
 import org.hibernate.query.Query;

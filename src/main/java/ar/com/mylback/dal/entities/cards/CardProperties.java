@@ -1,4 +1,4 @@
-package ar.com.mylback.dal.entities;
+package ar.com.mylback.dal.entities.cards;
 
 import jakarta.persistence.*;
 
@@ -7,6 +7,7 @@ public abstract class CardProperties {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Integer id;
+
     @Column(nullable = false, unique = true)
     protected String name;
 

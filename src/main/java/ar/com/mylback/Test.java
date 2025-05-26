@@ -1,6 +1,6 @@
 package ar.com.mylback;
 
-import ar.com.mylback.dal.entities.*;
+import ar.com.mylback.dal.entities.cards.*;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;

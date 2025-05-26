@@ -13,7 +13,7 @@ public class CardInsertDbBatch {
 
     public static void saveAllToDatabase(CardsData cardsData) throws Exception {
         List<Set<Card>> chunks = chunkListSet(cardsData.getCards(), BATCH_SIZE);
-        DAO<ar.com.mylback.dal.entities.Card, Integer> daoCard = new DAO<>(ar.com.mylback.dal.entities.Card.class);
+        DAO<ar.com.mylback.dal.entities.cards.Card, Integer> daoCard = new DAO<>(ar.com.mylback.dal.entities.cards.Card.class);
         Set<Card> toRetry = new HashSet<>();
         int total = chunks.size();
         int progress = 0;
@@ -23,7 +23,7 @@ public class CardInsertDbBatch {
             boolean success = false;
             for (int attempt = 1; attempt <= MAX_RETRIES; attempt++) {
                 try {
-                    List<ar.com.mylback.dal.entities.Card> entityCards = MapToEntities.mapCardToEntity(chunk, cardsData);
+                    List<ar.com.mylback.dal.entities.cards.Card> entityCards = MapToEntities.mapCardToEntity(chunk, cardsData);
                     daoCard.save(entityCards);
                     success = true;
                     break;

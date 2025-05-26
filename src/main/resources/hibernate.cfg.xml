@@ -31,13 +31,23 @@
         <property name="hibernate.connection.transacted">true</property>
 
         <!-- Entity mapping -->
-        <mapping class="ar.com.mylback.dal.entities.Card"/>
-        <mapping class="ar.com.mylback.dal.entities.Collection"/>
-        <mapping class="ar.com.mylback.dal.entities.Format"/>
-        <mapping class="ar.com.mylback.dal.entities.KeyWord"/>
-        <mapping class="ar.com.mylback.dal.entities.Race"/>
-        <mapping class="ar.com.mylback.dal.entities.Rarity"/>
-        <mapping class="ar.com.mylback.dal.entities.Type"/>
+        <!-- Cards entities -->
+        <mapping class="ar.com.mylback.dal.entities.cards.Card"/>
+        <mapping class="ar.com.mylback.dal.entities.cards.Collection"/>
+        <mapping class="ar.com.mylback.dal.entities.cards.Format"/>
+        <mapping class="ar.com.mylback.dal.entities.cards.KeyWord"/>
+        <mapping class="ar.com.mylback.dal.entities.cards.Race"/>
+        <mapping class="ar.com.mylback.dal.entities.cards.Rarity"/>
+        <mapping class="ar.com.mylback.dal.entities.cards.Type"/>
+
+        <!-- Users entities -->
+        <mapping class="ar.com.mylback.dal.entities.users.Store"/>
+        <mapping class="ar.com.mylback.dal.entities.users.Player"/>
+        <mapping class="ar.com.mylback.dal.entities.users.PlayerCard"/>
+        <mapping class="ar.com.mylback.dal.entities.users.Deck"/>
+        <mapping class="ar.com.mylback.dal.entities.users.DeckCard"/>
+
+
 
     </session-factory>
 </hibernate-configuration>

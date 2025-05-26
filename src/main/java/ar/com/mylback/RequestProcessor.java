@@ -1,7 +1,7 @@
 package ar.com.mylback;
 
 import ar.com.mylback.controller.CardPropertiesController;
-import ar.com.mylback.dal.entities.*;
+import ar.com.mylback.dal.entities.cards.*;
 import ar.com.mylback.utils.MylException;
 import ar.com.mylback.controller.CardsController;
 import ar.com.mylback.utils.QueryString;

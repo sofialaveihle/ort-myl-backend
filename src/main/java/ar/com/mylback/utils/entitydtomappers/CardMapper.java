@@ -1,6 +1,6 @@
 package ar.com.mylback.utils.entitydtomappers;
 
-import ar.com.mylback.dal.entities.Card;
+import ar.com.mylback.dal.entities.cards.Card;
 import ar.com.mylback.utils.ImageUrlGenerator;
 import jakarta.validation.constraints.NotNull;
 import ar.com.myldtos.cards.CardDTO;

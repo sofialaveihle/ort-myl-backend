@@ -1,4 +1,4 @@
-package ar.com.mylback.dal.entities;
+package ar.com.mylback.dal.entities.cards;
 
 import jakarta.persistence.*;
 
@@ -6,20 +6,20 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "rarities")
+@Table(name = "collections")
 @AttributeOverrides({
         @AttributeOverride(name = "id",
-                column = @Column(name = "rarity_id")
+                column = @Column(name = "collection_id")
         ),
         @AttributeOverride(name = "name",
-                column = @Column(name = "rarity_name", length = 50)
+                column = @Column(name = "collection_name", length = 100)
         )
 })
-public class Rarity extends CardProperties {
-    @OneToMany(mappedBy = "rarity", cascade = CascadeType.ALL, orphanRemoval = true)
+public class Collection extends CardProperties {
+    @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Card> cards = new HashSet<>();
 
-    public Rarity() {
+    public Collection() {
     }
 
     public Set<Card> getCards() {
