@@ -1,6 +1,8 @@
 package ar.com.mylback;
 
 import ar.com.mylback.controller.CardPropertiesController;
+import ar.com.mylback.controller.StoreController;
+import ar.com.mylback.controller.UserController;
 import ar.com.mylback.dal.entities.*;
 import ar.com.mylback.utils.MylException;
 import ar.com.mylback.controller.CardsController;
@@ -118,8 +120,28 @@ public class RequestProcessor implements Runnable {
                     } else {
                         sendResponse(exchange, 404, "404 Not Found");
                     }
-                } else {
-                    sendResponse(exchange, 404, "404 Not Found");
+                } else if (method.equals("POST")) {
+                    String body = new String(exchange.getRequestBody().readAllBytes());
+
+                    switch (path) {
+                        case "/api/users/register" -> {
+                            try {
+                                String response = new UserController().registerUser(body);
+                                sendResponse(exchange, 200, response);
+                            } catch (Exception e) {
+                                sendResponse(exchange, 500, "Error al registrar usuario: " + e.getMessage());
+                            }
+                        }
+                        case "/api/stores/register" -> {
+                            try {
+                                String response = new StoreController().registerStore(body);
+                                sendResponse(exchange, 200, response);
+                            } catch (Exception e) {
+                                sendResponse(exchange, 500, "Error al registrar tienda: " + e.getMessage());
+                            }
+                        }
+                        default -> sendResponse(exchange, 404, "POST endpoint not found");
+                    }
                 }
 
 
