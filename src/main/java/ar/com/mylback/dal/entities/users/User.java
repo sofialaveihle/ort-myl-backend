@@ -2,13 +2,11 @@ package ar.com.mylback.dal.entities.users;
 
 import jakarta.persistence.*;
 
-import java.util.UUID;
-
 @MappedSuperclass
 public abstract class User {
     @Id
-    @Column(columnDefinition = "BINARY(16)", nullable = false)
-    private UUID uuid;
+    @Column(name = "uuid", nullable = false, length = 100)
+    private String uuid;
 
     @Column(name = "email", nullable = false, length = 100)
     private String email;
@@ -16,11 +14,11 @@ public abstract class User {
     @Column(name = "name", length = 100)
     private String name;
 
-    public UUID getUuid() {
+    public String getUuid() {
         return uuid;
     }
 
-    public void setUuid(UUID uuid) {
+    public void setUuid(String uuid) {
         this.uuid = uuid;
     }
 
@@ -39,4 +37,5 @@ public abstract class User {
     public void setName(String name) {
         this.name = name;
     }
+
 }

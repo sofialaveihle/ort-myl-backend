@@ -9,10 +9,10 @@ public class PlayerCard {
     @EmbeddedId
     private PlayerCardId id;
 
-//    @ManyToOne
-//    @MapsId("playerUuid")
-//    @JoinColumn(name = "player_uuid")
-//    private Player player;
+    @ManyToOne
+    @MapsId("playerUuid")
+    @JoinColumn(name = "player_uuid")
+    private Player player;
 
     @ManyToOne
     @MapsId("cardId")

@@ -8,11 +8,13 @@ import java.util.UUID;
 
 @Embeddable
 public class PlayerCardId {
-    @Column(name = "player_uuid", columnDefinition = "BINARY(16)")
-    private UUID playerUuid;
+    @Column(name = "player_uuid", length = 100)
+    private String playerUuid;
 
     @Column(name = "card_id")
     private Integer cardId;
+
+
 
     @Override
     public boolean equals(Object o) {

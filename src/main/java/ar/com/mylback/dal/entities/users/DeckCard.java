@@ -9,10 +9,10 @@ public class DeckCard {
     @EmbeddedId
     private DeckCardId id;
 
-//    @ManyToOne
-//    @MapsId("deckId")
-//    @JoinColumn(name = "deck_id")
-//    private Deck deck;
+    @ManyToOne
+    @MapsId("deckId")
+    @JoinColumn(name = "deck_id")
+    private Deck deck;
 
     @ManyToOne
     @MapsId("cardId")
