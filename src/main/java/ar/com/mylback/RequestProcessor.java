@@ -1,6 +1,7 @@
 package ar.com.mylback;
 
 import ar.com.mylback.controller.CardPropertiesController;
+import ar.com.mylback.dal.entities.cards.*;
 import ar.com.mylback.controller.StoreController;
 import ar.com.mylback.controller.UserController;
 import ar.com.mylback.dal.entities.*;

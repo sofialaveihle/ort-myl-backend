@@ -1,6 +1,6 @@
-package ar.com.mylback.utils.entitydtomappers;
+package ar.com.mylback.utils.entitydtomappers.cards;
 
-import ar.com.mylback.dal.entities.CardProperties;
+import ar.com.mylback.dal.entities.cards.CardProperties;
 import ar.com.myldtos.cards.CardPropertiesDTO;
 
 public class CardPropertiesMapper {

@@ -1,8 +1,8 @@
 package ar.com.mylback.controller;
 
-import ar.com.mylback.dal.crud.DAOCardProperties;
-import ar.com.mylback.dal.entities.CardProperties;
-import ar.com.mylback.utils.entitydtomappers.CardPropertiesMapper;
+import ar.com.mylback.dal.crud.cards.DAOCardProperties;
+import ar.com.mylback.dal.entities.cards.CardProperties;
+import ar.com.mylback.utils.entitydtomappers.cards.CardPropertiesMapper;
 import ar.com.myldtos.cards.CardPropertiesDTO;
 import com.google.gson.Gson;
 

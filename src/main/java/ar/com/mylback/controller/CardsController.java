@@ -1,10 +1,10 @@
 package ar.com.mylback.controller;
 
-import ar.com.mylback.dal.crud.DAOCard;
-import ar.com.mylback.dal.entities.Card;
+import ar.com.mylback.dal.crud.cards.DAOCard;
+import ar.com.mylback.dal.entities.cards.Card;
 import ar.com.mylback.utils.ImageUrlGenerator;
 import ar.com.mylback.utils.QueryString;
-import ar.com.mylback.utils.entitydtomappers.CardMapper;
+import ar.com.mylback.utils.entitydtomappers.cards.CardMapper;
 import com.google.gson.Gson;
 import ar.com.myldtos.cards.CardDTO;
 

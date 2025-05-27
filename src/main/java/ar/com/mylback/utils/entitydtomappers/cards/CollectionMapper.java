@@ -1,6 +1,6 @@
-package ar.com.mylback.utils.entitydtomappers;
+package ar.com.mylback.utils.entitydtomappers.cards;
 
-import ar.com.mylback.dal.entities.Collection;
+import ar.com.mylback.dal.entities.cards.Collection;
 import ar.com.myldtos.cards.CollectionDTO;
 
 public class CollectionMapper {

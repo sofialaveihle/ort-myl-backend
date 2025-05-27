@@ -1,5 +1,6 @@
-package ar.com.mylback.dal.crud;
+package ar.com.mylback.dal.crud.cards;
 
+import ar.com.mylback.dal.crud.HibernateUtil;
 import ar.com.mylback.utils.MylException;
 import org.hibernate.Session;
 import org.hibernate.exception.ConstraintViolationException;
