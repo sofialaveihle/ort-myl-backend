@@ -3,20 +3,26 @@ package ar.com.mylback.utils.entitydtomappers.cards;
 import ar.com.mylback.dal.entities.cards.CardProperties;
 import ar.com.myldtos.cards.CardPropertiesDTO;
 
-public class CardPropertiesMapper {
-    public static void toDTO(CardProperties cardProperties, CardPropertiesDTO cardPropertiesDTO) {
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+public abstract class CardPropertiesMapper<T extends CardProperties, R extends CardPropertiesDTO> {
+    public void toDTO(T cardProperties, R cardPropertiesDTO) {
         if (cardPropertiesDTO != null && cardProperties != null) {
             cardPropertiesDTO.setId(cardProperties.getId());
             cardPropertiesDTO.setName(cardProperties.getName());
         }
     }
 
-    public static CardPropertiesDTO toDTO(CardProperties cardProperties) {
-        CardPropertiesDTO cardPropertiesDTO = new CardPropertiesDTO();
-        if (cardProperties != null) {
-            cardPropertiesDTO.setId(cardProperties.getId());
-            cardPropertiesDTO.setName(cardProperties.getName());
+    public abstract R toDTO(T cardProperties);
+
+    public List<R> toDTO(Set<T> entities) {
+        if (entities == null || entities.isEmpty()) {
+            return new ArrayList<>();
         }
-        return cardPropertiesDTO;
+        return entities.stream()
+                .map(this::toDTO)
+                .toList();
     }
 }

@@ -32,7 +32,9 @@ public class MylException extends Exception {
         GENERIC_ERROR(1000, "Generic error"),
         INIT_DB(1001, "Error init DB"),
         ERROR_DB_TRANSACTION(1002, "Database transaction error"),
-        ERROR_LOAD_IMAGE(1003, "Error load image");
+        ERROR_LOAD_IMAGE(1003, "Error load image"),
+        NULL_PARAMETER(1004, "Null parameter"),
+        EMPTY_PARAMETER(1005, "Empty parameter");
 
         private final int code;
         private final String message;

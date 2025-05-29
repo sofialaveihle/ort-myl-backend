@@ -10,7 +10,7 @@ public class DeckCardMapper {
     public static DeckCardDTO toDTO(DeckCard deckCard) {
         DeckCardDTO deckCardDTO = new DeckCardDTO();
         if (deckCard != null) {
-            deckCardDTO.setCard(CardMapper.toDTO(deckCard.getCard()));
+//            deckCardDTO.setCard(CardMapper.toDTO(deckCard.getCard()));
             deckCardDTO.setQuantity(deckCard.getQuantity());
         }
         return deckCardDTO;

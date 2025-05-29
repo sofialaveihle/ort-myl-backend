@@ -10,7 +10,7 @@ public class PlayerCardMapper {
     public static PlayerCardDTO toDTO(PlayerCard playerCard) {
         PlayerCardDTO playerCardDTO = new PlayerCardDTO();
         if (playerCard != null) {
-            playerCardDTO.setCard(CardMapper.toDTO(playerCard.getCard()));
+//            playerCardDTO.setCard(CardMapper.toDTO(playerCard.getCard()));
             playerCardDTO.setQuantity(playerCard.getQuantity());
         }
         return playerCardDTO;

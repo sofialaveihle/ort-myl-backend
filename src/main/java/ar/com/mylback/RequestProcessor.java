@@ -1,11 +1,8 @@
 package ar.com.mylback;
 
-import ar.com.mylback.controller.CardPropertiesController;
-import ar.com.mylback.dal.entities.cards.*;
-import ar.com.mylback.controller.StoreController;
-import ar.com.mylback.controller.UserController;
+import ar.com.mylback.controller.*;
+import ar.com.mylback.utils.InjectorProvider;
 import ar.com.mylback.utils.MylException;
-import ar.com.mylback.controller.CardsController;
 import ar.com.mylback.utils.QueryString;
 import com.sun.net.httpserver.HttpExchange;
 
@@ -16,10 +13,12 @@ import java.util.concurrent.BlockingQueue;
 public class RequestProcessor implements Runnable {
     private final BlockingQueue<HttpExchange> queue;
     private static volatile boolean isRunning;
+    private final InjectorProvider injectorProvider;
 
-    public RequestProcessor(BlockingQueue<HttpExchange> queue) throws MylException {
-        if (queue != null) {
+    public RequestProcessor(BlockingQueue<HttpExchange> queue, InjectorProvider injectorProvider) throws MylException {
+        if (queue != null && injectorProvider != null) {
             this.queue = queue;
+            this.injectorProvider = injectorProvider;
         } else {
             throw new MylException(MylException.Type.GENERIC_ERROR);
         }
@@ -42,7 +41,10 @@ public class RequestProcessor implements Runnable {
                         sendResponse(exchange, 200, response);
                     } else if (path.equals("/api/cards")) {
                         try {
-                            CardsController controller = new CardsController();
+                            CardController controller = new CardController(
+                                    injectorProvider.getGsonSupplier(),
+                                    injectorProvider.getDaoCardSupplier(),
+                                    injectorProvider.getCardMapperSupplier());
                             String response = controller.getCardsEndpoint(queryString);
                             sendResponse(exchange, 200, response);
                         } catch (Exception e) {
@@ -52,7 +54,10 @@ public class RequestProcessor implements Runnable {
                         try {
                             String[] parts = path.split("/");
                             if (parts.length >= 4) {
-                                CardsController controller = new CardsController();
+                                CardController controller = new CardController(
+                                        injectorProvider.getGsonSupplier(),
+                                        injectorProvider.getDaoCardSupplier(),
+                                        injectorProvider.getCardMapperSupplier());
                                 String response = controller.getCardByIDEndpoint(Integer.parseInt(parts[3]));
                                 sendResponse(exchange, 200, response);
                             } else {
@@ -63,7 +68,10 @@ public class RequestProcessor implements Runnable {
                         }
                     } else if (path.equals("/api/card/search")) {
                         try {
-                            CardsController controller = new CardsController();
+                            CardController controller = new CardController(
+                                    injectorProvider.getGsonSupplier(),
+                                    injectorProvider.getDaoCardSupplier(),
+                                    injectorProvider.getCardMapperSupplier());
                             String response = controller.getCardsByName(queryString);
                             sendResponse(exchange, 200, response);
                         } catch (Exception e) {
@@ -71,48 +79,48 @@ public class RequestProcessor implements Runnable {
                         }
                     } else if (path.equals("/api/collections")) {
                         try {
-                            CardPropertiesController<Collection> controller = new CardPropertiesController<>();
-                            String response = controller.getAllEndpoint(Collection.class);
+                            CollectionController controller = new CollectionController(injectorProvider.getCollectionMapperSupplier());
+                            String response = controller.getAll();
                             sendResponse(exchange, 200, response);
                         } catch (Exception e) {
                             sendResponse(exchange, 500, "Error parser collections: " + e.getMessage());
                         }
                     } else if (path.equals("/api/rarities")) {
                         try {
-                            CardPropertiesController<Rarity> controller = new CardPropertiesController<>();
-                            String response = controller.getAllEndpoint(Rarity.class);
+                            RarityController controller = new RarityController(injectorProvider.getRarityMapperSupplier());
+                            String response = controller.getAll();
                             sendResponse(exchange, 200, response);
                         } catch (Exception e) {
                             sendResponse(exchange, 500, "Error parser rarities: " + e.getMessage());
                         }
                     } else if (path.equals("/api/types")) {
                         try {
-                            CardPropertiesController<Type> controller = new CardPropertiesController<>();
-                            String response = controller.getAllEndpoint(Type.class);
+                            TypeController controller = new TypeController(injectorProvider.getTypeMapperSupplier());
+                            String response = controller.getAll();
                             sendResponse(exchange, 200, response);
                         } catch (Exception e) {
                             sendResponse(exchange, 500, "Error parser types: " + e.getMessage());
                         }
                     } else if (path.equals("/api/races")) {
                         try {
-                            CardPropertiesController<Race> controller = new CardPropertiesController<>();
-                            String response = controller.getAllEndpoint(Race.class);
+                            RaceController controller = new RaceController(injectorProvider.getRaceMapperSupplier());
+                            String response = controller.getAll();
                             sendResponse(exchange, 200, response);
                         } catch (Exception e) {
                             sendResponse(exchange, 500, "Error parser races: " + e.getMessage());
                         }
                     } else if (path.equals("/api/formats")) {
                         try {
-                            CardPropertiesController<Format> controller = new CardPropertiesController<>();
-                            String response = controller.getAllEndpoint(Format.class);
+                            FormatController controller = new FormatController(injectorProvider.getFormatMapperSupplier());
+                            String response = controller.getAll();
                             sendResponse(exchange, 200, response);
                         } catch (Exception e) {
                             sendResponse(exchange, 500, "Error parser formats: " + e.getMessage());
                         }
                     } else if (path.equals("/api/keywords")) {
                         try {
-                            CardPropertiesController<KeyWord> controller = new CardPropertiesController<>();
-                            String response = controller.getAllEndpoint(KeyWord.class);
+                            KeyWordController controller = new KeyWordController(injectorProvider.getKeyWordMapperSupplier());
+                            String response = controller.getAll();
                             sendResponse(exchange, 200, response);
                         } catch (Exception e) {
                             sendResponse(exchange, 500, "Error parser keywords: " + e.getMessage());

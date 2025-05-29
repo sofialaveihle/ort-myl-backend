@@ -2,19 +2,31 @@ package ar.com.mylback.controller;
 
 import ar.com.mylback.dal.crud.cards.DAOCard;
 import ar.com.mylback.dal.entities.cards.Card;
-import ar.com.mylback.utils.ImageUrlGenerator;
+import ar.com.mylback.utils.MylException;
 import ar.com.mylback.utils.QueryString;
 import ar.com.mylback.utils.entitydtomappers.cards.CardMapper;
-import com.google.gson.Gson;
 import ar.com.myldtos.cards.CardDTO;
+import com.google.gson.Gson;
 
 import java.util.List;
 
-public class CardsController {
+public class CardController {
+    private final Gson gson;
+    private final DAOCard<Integer> daoCard;
+    private final CardMapper cardMapper;
+
+    public CardController(Gson gson, DAOCard<Integer> daoCard, CardMapper cardMapper) throws MylException {
+        if (gson != null && daoCard != null && cardMapper != null) {
+            this.gson = gson;
+            this.daoCard = daoCard;
+            this.cardMapper = cardMapper;
+        } else {
+            throw new MylException(MylException.Type.NULL_PARAMETER);
+        }
+    }
 
     public String getCardsEndpoint(QueryString queryString) throws Exception {
         // get cards from DB
-        DAOCard<Integer> daoCard = new DAOCard<>();
         List<Card> cards = daoCard.findAllPagedFiltered(queryString.getPage(),
                 queryString.getPageSize(),
                 queryString.getCosts(),
@@ -31,8 +43,6 @@ public class CardsController {
     }
 
     public String getCardsByName(QueryString queryString) throws Exception {
-        DAOCard<Integer> daoCard = new DAOCard<>();
-
         List<Card> cards = daoCard.findAllPagedFiltered(queryString.getPage(), queryString.getPageSize(),
                 List.of(),
                 List.of(),
@@ -47,23 +57,17 @@ public class CardsController {
         return getCardsFromList(cards);
     }
 
-    private String getCardsFromList(List<Card> cards) {
-        List<CardDTO> cardDTOs = cards.stream()
-                .map(CardMapper::toDTO)
-                .toList();
+    public String getCardByIDEndpoint(int id) throws Exception {
+        CardDTO cardDTO = cardMapper.toDTO(daoCard.findById(id));
 
-        ImageUrlGenerator.getInstance().close();
-        Gson gson = new Gson();
-        return gson.toJson(cardDTOs);
+        return gson.toJson(cardDTO);
     }
 
-    public String getCardByIDEndpoint(int id) throws Exception {
-        DAOCard<Integer> daoCard = new DAOCard<>();
+    private String getCardsFromList(List<Card> cards) {
+        List<CardDTO> cardDTOs = cards.stream()
+                .map(cardMapper::toDTO)
+                .toList();
 
-        CardDTO cardDTO = CardMapper.toDTO(daoCard.findById(id));
-
-        ImageUrlGenerator.getInstance().close();
-        Gson gson = new Gson();
-        return gson.toJson(cardDTO);
+        return gson.toJson(cardDTOs);
     }
 }

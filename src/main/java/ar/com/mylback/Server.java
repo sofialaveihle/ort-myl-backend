@@ -2,6 +2,12 @@ package ar.com.mylback;
 
 import ar.com.mylback.auth.FirebaseInitializer;
 
+import ar.com.mylback.dal.crud.cards.DAOCard;
+import ar.com.mylback.utils.ImageUrlGenerator;
+import ar.com.mylback.utils.InjectorProvider;
+import ar.com.mylback.utils.MylException;
+import ar.com.mylback.utils.entitydtomappers.cards.*;
+import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 
@@ -28,14 +34,53 @@ public class Server {
         // Thread pool for worker threads
         ExecutorService workerPool = Executors.newFixedThreadPool(4); // for processing
 
-        // Start workers
-        for (int i = 0; i < 4; i++) {
-            try {
-                workerPool.submit(new RequestProcessor(requestQueue));
-            } catch (Exception e) {
-                System.err.println("Fail to start worker thread " + (i + 1) + ": " + e.getMessage());
+        // singleton dependencies
+        Gson gson = new Gson();
+        ImageUrlGenerator imageUrlGenerator = new ImageUrlGenerator();
+
+        // singleton mappers
+        CollectionMapper collectionMapper   = new CollectionMapper();
+        RarityMapper rarityMapper           = new RarityMapper();
+        TypeMapper typeMapper               = new TypeMapper();
+        RaceMapper raceMapper               = new RaceMapper();
+        FormatMapper formatMapper           = new FormatMapper();
+        KeyWordMapper keyWordMapper         = new KeyWordMapper();
+
+        try {
+            CardMapper cardMapper = new CardMapper(
+                    imageUrlGenerator,
+                    collectionMapper,
+                    rarityMapper,
+                    typeMapper,
+                    raceMapper,
+                    formatMapper,
+                    keyWordMapper
+            );
+
+            InjectorProvider injectorProvider = new InjectorProvider(
+                    () -> gson,
+                    DAOCard::new,
+                    () -> cardMapper,
+                    () -> collectionMapper,
+                    () -> rarityMapper,
+                    () -> formatMapper,
+                    () -> keyWordMapper,
+                    () -> raceMapper,
+                    () -> typeMapper
+            );
+
+            // Start workers
+            for (int i = 0; i < 4; i++) {
+                try {
+                    workerPool.submit(new RequestProcessor(requestQueue, injectorProvider));
+                } catch (Exception e) {
+                    System.err.println("Fail to start worker thread " + (i + 1) + ": " + e.getMessage());
+                }
             }
+        } catch (MylException e) {
+            throw new RuntimeException(e);
         }
+
         RequestProcessor.start();
 
         // Single context with router logic
@@ -51,6 +96,7 @@ public class Server {
 
         // shut down process
         // Listen to console input in a separate thread
+        // TODO call ImageUrlGenerator.close
         new Thread(() -> {
             Scanner scanner = new Scanner(System.in);
             while (true) {
