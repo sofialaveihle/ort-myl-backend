@@ -1,60 +1,50 @@
 package ar.com.mylback.controller;
 
+import ar.com.mylback.auth.FirebaseAuthValidator;
 import ar.com.mylback.auth.FirebaseInitializer;
 import ar.com.mylback.dal.crud.cards.DAO;
+import ar.com.mylback.dal.crud.users.DAOPlayer;
+import ar.com.mylback.dal.crud.users.DAOStore;
 import ar.com.mylback.dal.entities.users.Player;
+import ar.com.mylback.dal.entities.users.Store;
+import ar.com.mylback.utils.entitydtomappers.users.PlayerMapper;
+import ar.com.mylback.utils.entitydtomappers.users.StoreMapper;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.UserRecord;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import users.PlayerDTO;
+import users.PlayerRegisterDTO;
+import users.StoreDTO;
 
 public class UserController {
 
     private static final Gson gson = new Gson();
 
-    public String registerUser(String requestBody) {
+    public String updatePlayer(String requestBody, String authHeader) {
         FirebaseInitializer.init();
 
-        UserRecord userRecord = null;
-
         try {
-            JsonObject json = gson.fromJson(requestBody, JsonObject.class);
-            String email = json.get("email").getAsString();
-            String password = json.get("password").getAsString();
+            String uid = FirebaseAuthValidator.validateAndGetUid(authHeader);
 
-            // 1. Crear en Firebase
-            UserRecord.CreateRequest request = new UserRecord.CreateRequest()
-                    .setEmail(email)
-                    .setPassword(password);
+            PlayerDTO dto = gson.fromJson(requestBody, PlayerDTO.class);
 
-            userRecord = FirebaseAuth.getInstance().createUser(request);
+            DAOPlayer daoPlayer = new DAOPlayer();
+            Player player = daoPlayer.findByUuid(uid);
 
-            // 2. Insertar en base de datos
-            Player user = new Player();
-            user.setEmail(email);
-            user.setUuid(userRecord.getUid());
-
-            new DAO<>(Player.class).save(user);
-
-            // TODO: Hay qeu crear un SMTP si queremos enviar
-            //  desde el backend la notificación de verificación
-            //   sino debe hacerlo el FRONT
-            FirebaseAuth.getInstance().generateEmailVerificationLink(email);
-
-            return "{\"message\": \"Usuario registrado correctamente\"}";
-
-        } catch (Exception e) {
-            //  Rollback si se creó el usuario en Firebase pero MySQL falló
-            if (userRecord != null) {
-                try {
-                    FirebaseAuth.getInstance().deleteUser(userRecord.getUid());
-                } catch (Exception deleteEx) {
-                    System.err.println("Error al revertir usuario en Firebase: " + deleteEx.getMessage());
-                }
+            if (player == null) {
+                return "{\"error\": \"Jugador no encontrado\"}";
             }
 
-            System.err.println("Error al registrar usuario: " + e.getMessage());
-            return "{\"error\": \"Error al registrar usuario: " + e.getMessage() + "\"}";
+            player.setName(dto.getName());
+
+            daoPlayer.update(player);
+
+            return "{\"message\": \"Jugador actualizado correctamente\"}";
+
+        } catch (Exception e) {
+            System.err.println("Error al actualizar jugador: " + e.getMessage());
+            return "{\"error\": \"Error al actualizar jugador: " + e.getMessage() + "\"}";
         }
     }
 }

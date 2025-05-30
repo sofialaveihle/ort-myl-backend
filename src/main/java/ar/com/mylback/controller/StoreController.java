@@ -1,67 +1,153 @@
 package ar.com.mylback.controller;
 
+import ar.com.mylback.auth.FirebaseAuthValidator;
 import ar.com.mylback.auth.FirebaseInitializer;
 import ar.com.mylback.dal.crud.cards.DAO;
+import ar.com.mylback.dal.crud.users.DAOStore;
 import ar.com.mylback.dal.entities.users.Store;
+import ar.com.mylback.utils.MylException;
+import ar.com.mylback.utils.entitydtomappers.users.StoreMapper;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.UserRecord;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import users.StoreDTO;
+import users.StoreRegisterDTO;
+
+import java.util.List;
 
 public class StoreController {
 
     private static final Gson gson = new Gson();
 
-    public String registerStore(String requestBody) {
-        FirebaseInitializer.init();
-
-        UserRecord userRecord = null;
-
+    public String getAllValidStores() {
         try {
-            JsonObject json = gson.fromJson(requestBody, JsonObject.class);
-            String email = json.get("email").getAsString();
-            String password = json.get("password").getAsString();
-            String storeName = json.get("storeName").getAsString();
-            String address = json.get("address").getAsString();
-            String phone = json.get("phone").getAsString();
+            DAOStore daoStore = new DAOStore();
+            List<Store> stores = daoStore.findAllValid();
 
+            List<StoreDTO> storeDTOs = stores.stream()
+                    .map(StoreMapper::toDTO)
+                    .toList();
 
-            UserRecord.CreateRequest request = new UserRecord.CreateRequest()
-                    .setEmail(email)
-                    .setPassword(password);
-
-            userRecord = FirebaseAuth.getInstance().createUser(request);
-
-
-            Store store = new Store();
-            store.setEmail(email);
-            store.setUuid(userRecord.getUid());
-            store.setName(storeName);
-            store.setAddress(address);
-            store.setPhoneNumber(phone);
-            store.setValid(false);
-
-            new DAO<>(Store.class).save(store);
-
-            // TODO: Hay qeu crear un SMTP si queremos enviar
-            //  desde el backend la notificación de verificación
-            //   sino debe hacerlo el FRONT
-            FirebaseAuth.getInstance().generateEmailVerificationLink(email);
-
-            return "{\"message\": \"Tienda registrada correctamente\"}";
+            return new Gson().toJson(storeDTOs);
 
         } catch (Exception e) {
-            // ROLLBACK Si Firebase ya creó el usuario y falla se elimina
-            if (userRecord != null) {
-                try {
-                    FirebaseAuth.getInstance().deleteUser(userRecord.getUid());
-                } catch (Exception deleteEx) {
-                    System.err.println("Error al revertir usuario en Firebase: " + deleteEx.getMessage());
-                }
-            }
-
-            System.err.println("Error al registrar tienda: " + e.getMessage());
-            return "{\"error\": \"Error al registrar tienda: " + e.getMessage() + "\"}";
+            System.err.println("Error al obtener tiendas: " + e.getMessage());
+            return "{\"error\": \"No se pudieron obtener las tiendas\"}";
         }
     }
+
+    public String getStoreByUuid(String uuid) {
+        try {
+            DAOStore daoStore = new DAOStore();
+            Store store = daoStore.findByUuid(uuid);
+
+            if (store == null || !store.isValid()) {
+                return "{\"error\": \"Tienda no encontrada o no validada\"}";
+            }
+
+            StoreDTO dto = StoreMapper.toDTO(store);
+            return new Gson().toJson(dto);
+
+        } catch (Exception e) {
+            System.err.println("Error al obtener tienda por UUID: " + e.getMessage());
+            return "{\"error\": \"No se pudo obtener la tienda\"}";
+        }
+    }
+
+
+    public String getAllUnverifiedStores(String authHeader) {
+        try {
+            String uid = FirebaseAuthValidator.validateAndGetUid(authHeader);
+
+            // TODO: validar que uid sea admin
+            DAOStore daoStore = new DAOStore();
+            List<Store> unverifiedStores = daoStore.findAllUnverified();
+
+            List<StoreDTO> storeDTOs = unverifiedStores.stream()
+                    .map(StoreMapper::toDTO)
+                    .toList();
+
+            return gson.toJson(storeDTOs);
+        } catch (Exception e) {
+            System.err.println("Error al obtener tiendas no verificadas: " + e.getMessage());
+            return "{\"error\": \"No se pudieron obtener las tiendas no verificadas\"}";
+        }
+    }
+
+    public String getUnverifiedStoreByUuid(String uuid, String authHeader) {
+        try {
+            String uid = FirebaseAuthValidator.validateAndGetUid(authHeader);
+            // TODO: validar que uid sea admin
+
+            DAOStore daoStore = new DAOStore();
+            Store store = daoStore.findByUuid(uuid);
+
+            if (store == null || store.isValid()) {
+                return "{\"error\": \"Tienda no encontrada o ya validada\"}";
+            }
+
+            StoreDTO dto = StoreMapper.toDTO(store);
+            return gson.toJson(dto);
+
+        } catch (Exception e) {
+            System.err.println("Error al obtener tienda no verificada por UUID: " + e.getMessage());
+            return "{\"error\": \"No se pudo obtener la tienda\"}";
+        }
+    }
+
+    public String validateStore(String uuid, String authHeader) {
+        try {
+            String uid = FirebaseAuthValidator.validateAndGetUid(authHeader);
+            // TODO: validar que uid sea admin
+
+            DAOStore daoStore = new DAOStore();
+            Store store = daoStore.findByUuid(uuid);
+
+            if (store == null) {
+                return "{\"error\": \"Tienda no encontrada\"}";
+            }
+
+            store.setValid(true);
+            daoStore.update(store);
+
+            return "{\"message\": \"Tienda validada correctamente\"}";
+        } catch (Exception e) {
+            System.err.println("Error al validar tienda: " + e.getMessage());
+            return "{\"error\": \"No se pudo validar la tienda\"}";
+        }
+    }
+
+    public String updateStore(String requestBody, String authHeader) {
+        FirebaseInitializer.init();
+
+        try {
+            String uid = FirebaseAuthValidator.validateAndGetUid(authHeader);
+
+            StoreDTO dto = gson.fromJson(requestBody, StoreDTO.class);
+
+            DAOStore daoStore = new DAOStore();
+            Store store = daoStore.findByUuid(uid);
+
+            if (store == null) {
+                return "{\"error\": \"Tienda no encontrada\"}";
+            }
+
+            store.setName(dto.getName());
+            store.setAddress(dto.getAddress());
+            store.setPhoneNumber(dto.getPhoneNumber());
+            store.setUrl(dto.getUrl());
+
+            daoStore.update(store);
+
+            return "{\"message\": \"Tienda actualizada correctamente\"}";
+
+        } catch (Exception e) {
+            System.err.println("Error al actualizar tienda: " + e.getMessage());
+            return "{\"error\": \"Error al actualizar tienda: " + e.getMessage() + "\"}";
+        }
+    }
+
+
+
 }

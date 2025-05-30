@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 @Table(name = "stores")
 @AttributeOverrides({
         @AttributeOverride(name = "uuid",
-                column = @Column(name = "store_uuid", length = 100)
+                column = @Column(name = "store_uuid", length = 128)
         )
 })
 public class Store extends User {
