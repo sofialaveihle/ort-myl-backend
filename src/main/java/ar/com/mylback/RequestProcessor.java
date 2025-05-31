@@ -177,7 +177,8 @@ public class RequestProcessor implements Runnable {
                         case "/api/auth/registerPlayer" -> {
                             try {
                                 String response = new AuthController().registerPlayer(body);
-                                sendResponse(exchange, 200, response);
+                                int statusCode = response.contains("\"error\"") ? 400 : 200;
+                                sendResponse(exchange, statusCode, response);
                             } catch (Exception e) {
                                 sendResponse(exchange, 500, "Error al registrar usuario: " + e.getMessage());
                             }
@@ -186,7 +187,8 @@ public class RequestProcessor implements Runnable {
                         case "/api/auth/registerStore" -> {
                             try {
                                 String response = new AuthController().registerStore(body);
-                                sendResponse(exchange, 200, response);
+                                int statusCode = response.contains("\"error\"") ? 400 : 200;
+                                sendResponse(exchange, statusCode, response);
                             } catch (Exception e) {
                                 sendResponse(exchange, 500, "Error al registrar tienda: " + e.getMessage());
                             }
@@ -196,7 +198,8 @@ public class RequestProcessor implements Runnable {
                             try {
                                 String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
                                 String response = new AuthController().loginUser(authHeader);
-                                sendResponse(exchange, 200, response);
+                                int statusCode = response.contains("\"error\"") ? 401 : 200;
+                                sendResponse(exchange, statusCode, response);
                             } catch (Exception e) {
                                 sendResponse(exchange, 500, "Error en login: " + e.getMessage());
                             }

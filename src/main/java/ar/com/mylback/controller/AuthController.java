@@ -9,59 +9,37 @@ import ar.com.mylback.dal.entities.users.Player;
 import ar.com.mylback.dal.entities.users.Store;
 import ar.com.mylback.utils.entitydtomappers.users.PlayerMapper;
 import ar.com.mylback.utils.entitydtomappers.users.StoreMapper;
+import ar.com.mylback.utils.entitydtomappers.users.UserMapper;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.UserRecord;
 import com.google.gson.Gson;
 import users.PlayerDTO;
-import users.PlayerRegisterDTO;
 import users.StoreDTO;
-import users.StoreRegisterDTO;
 
 public class AuthController {
 
     private static final Gson gson = new Gson();
 
-    public String registerStore(String requestBody) {
-        try {
-            StoreRegisterDTO dto = gson.fromJson(requestBody, StoreRegisterDTO.class);
+    public String registerStore(String requestBody) throws Exception {
 
-            Store store = new Store();
-            store.setUuid(dto.getUuid());
-            store.setEmail(dto.getEmail());
-            store.setName(dto.getStoreName());
-            store.setAddress(dto.getAddress());
-            store.setPhoneNumber(dto.getPhone());
-            store.setUrl(dto.getUrl());
-            store.setValid(false);
+            StoreDTO dto = gson.fromJson(requestBody, StoreDTO.class);
+            Store store = StoreMapper.fromDTO(dto);
 
             new DAO<>(Store.class).save(store);
 
             return "{\"message\": \"Tienda registrada correctamente\"}";
-
-        } catch (Exception e) {
-            System.err.println("Error al registrar tienda: " + e.getMessage());
-            return "{\"error\": \"Error al registrar tienda: " + e.getMessage() + "\"}";
-        }
     }
 
-    public String registerPlayer(String requestBody) {
-        try {
-            PlayerRegisterDTO dto = gson.fromJson(requestBody, PlayerRegisterDTO.class);
+    public String registerPlayer(String requestBody) throws Exception {
+
+            PlayerDTO dto = gson.fromJson(requestBody, PlayerDTO.class);
 
             Player player = new Player();
-            player.setUuid(dto.getUuid());
-            player.setEmail(dto.getEmail());
-            player.setName(dto.getName());
+            UserMapper.fromDTO(dto, player);
 
             new DAO<>(Player.class).save(player);
 
             return "{\"message\": \"Usuario registrado correctamente\"}";
-
-        } catch (Exception e) {
-            System.err.println("Error al registrar usuario:");
-            e.printStackTrace();
-            return "{\"error\": \"Error al registrar usuario: " + e.getMessage() + "\"}";
-        }
     }
 
     public String loginUser(String authHeader) {

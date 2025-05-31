@@ -15,4 +15,18 @@ public class StoreMapper {
         }
         return storeDTO;
     }
+
+    public static Store fromDTO(StoreDTO dto) {
+        if (dto == null) return null;
+
+        Store store = new Store();
+        UserMapper.fromDTO(dto, store);
+        store.setAddress(dto.getAddress());
+        store.setPhoneNumber(dto.getPhoneNumber());
+        store.setUrl(dto.getUrl());
+        store.setValid(false);
+
+        return store;
+    }
+
 }
