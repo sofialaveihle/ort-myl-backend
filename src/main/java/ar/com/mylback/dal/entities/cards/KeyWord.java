@@ -1,4 +1,4 @@
-package ar.com.mylback.dal.entities;
+package ar.com.mylback.dal.entities.cards;
 
 import jakarta.persistence.*;
 

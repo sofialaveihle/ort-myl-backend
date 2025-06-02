@@ -1,7 +1,8 @@
 package ar.com.test.loaddata;
 
-import ar.com.mylback.dal.crud.DAO;
+import ar.com.mylback.dal.crud.cards.DAO;
 import ar.com.mylback.dal.crud.HibernateUtil;
+import ar.com.mylback.dal.entities.cards.*;
 import ar.com.test.loaddata.deserializers.CardsDataDeserializer;
 import ar.com.test.loaddata.models.CardsData;
 import com.google.gson.Gson;
@@ -53,22 +54,22 @@ public class LoadDataBase {
                 System.out.print("Complete card data from API complete. Continue Y/N: ");
                 next = scanner.nextLine().toUpperCase();
                 if (next.equals("Y")) {
-                    DAO<ar.com.mylback.dal.entities.Collection, Integer> daoCollection = new DAO<>(ar.com.mylback.dal.entities.Collection.class);
+                    DAO<Collection, Integer> daoCollection = new DAO<>(Collection.class);
                     daoCollection.save(MapToEntities.mapCollectionToEntity(data));
 
-                    DAO<ar.com.mylback.dal.entities.Format, Integer> daoFormat = new DAO<>(ar.com.mylback.dal.entities.Format.class);
+                    DAO<Format, Integer> daoFormat = new DAO<>(Format.class);
                     daoFormat.save(MapToEntities.mapFormatToEntity());
 
-                    DAO<ar.com.mylback.dal.entities.KeyWord, Integer> daoKeyWord = new DAO<>(ar.com.mylback.dal.entities.KeyWord.class);
+                    DAO<KeyWord, Integer> daoKeyWord = new DAO<>(KeyWord.class);
                     daoKeyWord.save(MapToEntities.mapKeyWordsToEntity(data));
 
-                    DAO<ar.com.mylback.dal.entities.Race, Integer> daoRace = new DAO<>(ar.com.mylback.dal.entities.Race.class);
+                    DAO<Race, Integer> daoRace = new DAO<>(Race.class);
                     daoRace.save(MapToEntities.mapRaceToEntity(data));
 
-                    DAO<ar.com.mylback.dal.entities.Rarity, Integer> daoRarity = new DAO<>(ar.com.mylback.dal.entities.Rarity.class);
+                    DAO<Rarity, Integer> daoRarity = new DAO<>(Rarity.class);
                     daoRarity.save(MapToEntities.mapRarityToEntity(data));
 
-                    DAO<ar.com.mylback.dal.entities.Type, Integer> daoType = new DAO<>(ar.com.mylback.dal.entities.Type.class);
+                    DAO<Type, Integer> daoType = new DAO<>(Type.class);
                     daoType.save(MapToEntities.mapTypeToEntity(data));
 
                     // load the cards with the reference to the loaded objets

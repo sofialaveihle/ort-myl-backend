@@ -1,7 +1,8 @@
 package ar.com.mylback.dal.crud;
 
+import ar.com.mylback.dal.entities.cards.*;
+import ar.com.mylback.dal.entities.users.*;
 import ar.com.mylback.utils.MylException;
-import ar.com.mylback.dal.entities.*;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -28,6 +29,9 @@ public class HibernateUtil {
                         .addAnnotatedClass(Race.class)
                         .addAnnotatedClass(Rarity.class)
                         .addAnnotatedClass(Type.class)
+                        .addAnnotatedClass(User.class)
+                        .addAnnotatedClass(Player.class)
+                        .addAnnotatedClass(Store.class)
                         .buildSessionFactory();
             } catch (HibernateException ex) {
                 throw new MylException();

@@ -1,8 +1,8 @@
 package ar.com.test.loaddata;
 
 import ar.com.mylback.utils.MylException;
-import ar.com.mylback.dal.crud.DAOCardProperties;
-import ar.com.mylback.dal.entities.CardProperties;
+import ar.com.mylback.dal.crud.cards.DAOCardProperties;
+import ar.com.mylback.dal.entities.cards.CardProperties;
 import ar.com.test.loaddata.models.*;
 import ar.com.test.loaddata.models.Collection;
 import ar.com.test.loaddata.models.Properties;
@@ -13,12 +13,12 @@ import java.util.stream.Collectors;
 
 public class MapToEntities {
 
-    public static List<ar.com.mylback.dal.entities.Card> mapCardToEntity(Set<Card> cards, CardsData cardsData) throws MylException {
-        List<ar.com.mylback.dal.entities.Card> cardsEntities = new ArrayList<>();
+    public static List<ar.com.mylback.dal.entities.cards.Card> mapCardToEntity(Set<Card> cards, CardsData cardsData) throws MylException {
+        List<ar.com.mylback.dal.entities.cards.Card> cardsEntities = new ArrayList<>();
 
         if (cards != null) {
             for (Card card : cards) {
-                ar.com.mylback.dal.entities.Card entityCard = new ar.com.mylback.dal.entities.Card();
+                ar.com.mylback.dal.entities.cards.Card entityCard = new ar.com.mylback.dal.entities.cards.Card();
                 entityCard.setName(card.getName());
                 entityCard.setDescription(card.getAbility());
                 if (card.getCost() != null) {
@@ -32,13 +32,13 @@ public class MapToEntities {
                 entityCard.setCollection(getCollectionFromDB(cardsData.getCollections(), card));
 
                 // search and set rarity
-                entityCard.setRarity(getCardPropertiesFromDB(cardsData.getRarities(), card.getRarity(), ar.com.mylback.dal.entities.Rarity.class));
+                entityCard.setRarity(getCardPropertiesFromDB(cardsData.getRarities(), card.getRarity(), ar.com.mylback.dal.entities.cards.Rarity.class));
 
                 // search and set type
-                entityCard.setType(getCardPropertiesFromDB(cardsData.getTypes(), card.getType(), ar.com.mylback.dal.entities.Type.class));
+                entityCard.setType(getCardPropertiesFromDB(cardsData.getTypes(), card.getType(), ar.com.mylback.dal.entities.cards.Type.class));
 
                 // search and set race
-                entityCard.setRace(getCardPropertiesFromDB(cardsData.getRaces(), card.getRace(), ar.com.mylback.dal.entities.Race.class));
+                entityCard.setRace(getCardPropertiesFromDB(cardsData.getRaces(), card.getRace(), ar.com.mylback.dal.entities.cards.Race.class));
 
                 // set formats
                 entityCard.setFormats(getFormats(card));
@@ -53,7 +53,7 @@ public class MapToEntities {
                         })
                         .map(KeyWord::getTitle)
                         .collect(Collectors.toSet());
-                List<ar.com.mylback.dal.entities.KeyWord> keyWords = new DAOCardProperties<>(ar.com.mylback.dal.entities.KeyWord.class).findAllByName(keyWordsNames);
+                List<ar.com.mylback.dal.entities.cards.KeyWord> keyWords = new DAOCardProperties<>(ar.com.mylback.dal.entities.cards.KeyWord.class).findAllByName(keyWordsNames);
                 entityCard.setKeyWords(new HashSet<>(keyWords));
 
                 entityCard.setImageUuid(UUID.randomUUID());
@@ -68,9 +68,9 @@ public class MapToEntities {
     }
 
     @NotNull
-    private static Set<ar.com.mylback.dal.entities.Format> getFormats(Card card) throws MylException {
-        Set<ar.com.mylback.dal.entities.Format> formatEntity = new HashSet<>();
-        DAOCardProperties<ar.com.mylback.dal.entities.Format, String> daoCardProperties = new DAOCardProperties<>(ar.com.mylback.dal.entities.Format.class);
+    private static Set<ar.com.mylback.dal.entities.cards.Format> getFormats(Card card) throws MylException {
+        Set<ar.com.mylback.dal.entities.cards.Format> formatEntity = new HashSet<>();
+        DAOCardProperties<ar.com.mylback.dal.entities.cards.Format, String> daoCardProperties = new DAOCardProperties<>(ar.com.mylback.dal.entities.cards.Format.class);
         if (card.getFormats() != null) {
             if (card.getFormats().isEmpire()) {
                 formatEntity.add(daoCardProperties.findByName("empire"));
@@ -95,8 +95,8 @@ public class MapToEntities {
         return formatEntity;
     }
 
-    private static ar.com.mylback.dal.entities.Collection getCollectionFromDB(Set<Collection> collections, Card card) throws MylException {
-        DAOCardProperties<ar.com.mylback.dal.entities.Collection, String> daoCardProperties = new DAOCardProperties<>(ar.com.mylback.dal.entities.Collection.class);
+    private static ar.com.mylback.dal.entities.cards.Collection getCollectionFromDB(Set<Collection> collections, Card card) throws MylException {
+        DAOCardProperties<ar.com.mylback.dal.entities.cards.Collection, String> daoCardProperties = new DAOCardProperties<>(ar.com.mylback.dal.entities.cards.Collection.class);
         String name = collections.stream()
                 .filter(collection -> collection.getId().equals(card.getEd_edid()))
                 .map(Collection::getTitle)
@@ -124,12 +124,12 @@ public class MapToEntities {
         return daoCardProperties.findByName(name);
     }
 
-    public static List<ar.com.mylback.dal.entities.Collection> mapCollectionToEntity(CardsData cardsData) {
-        List<ar.com.mylback.dal.entities.Collection> collectionsEntity = new ArrayList<>();
+    public static List<ar.com.mylback.dal.entities.cards.Collection> mapCollectionToEntity(CardsData cardsData) {
+        List<ar.com.mylback.dal.entities.cards.Collection> collectionsEntity = new ArrayList<>();
 
         if (cardsData != null) {
             for (Collection collection : cardsData.getCollections()) {
-                ar.com.mylback.dal.entities.Collection entityCollection = new ar.com.mylback.dal.entities.Collection();
+                ar.com.mylback.dal.entities.cards.Collection entityCollection = new ar.com.mylback.dal.entities.cards.Collection();
 
                 entityCollection.setName(collection.getTitle());
 
@@ -139,39 +139,39 @@ public class MapToEntities {
         return collectionsEntity;
     }
 
-    public static List<ar.com.mylback.dal.entities.Format> mapFormatToEntity() {
-        List<ar.com.mylback.dal.entities.Format> formatEntity = new ArrayList<>();
+    public static List<ar.com.mylback.dal.entities.cards.Format> mapFormatToEntity() {
+        List<ar.com.mylback.dal.entities.cards.Format> formatEntity = new ArrayList<>();
 
-        ar.com.mylback.dal.entities.Format formatEmpire = new ar.com.mylback.dal.entities.Format();
+        ar.com.mylback.dal.entities.cards.Format formatEmpire = new ar.com.mylback.dal.entities.cards.Format();
         formatEmpire.setName("empire");
         formatEntity.add(formatEmpire);
 
-        ar.com.mylback.dal.entities.Format infantry = new ar.com.mylback.dal.entities.Format();
+        ar.com.mylback.dal.entities.cards.Format infantry = new ar.com.mylback.dal.entities.cards.Format();
         infantry.setName("infantry");
         formatEntity.add(infantry);
 
 
-        ar.com.mylback.dal.entities.Format vcr = new ar.com.mylback.dal.entities.Format();
+        ar.com.mylback.dal.entities.cards.Format vcr = new ar.com.mylback.dal.entities.cards.Format();
         vcr.setName("vcr");
         formatEntity.add(vcr);
 
-        ar.com.mylback.dal.entities.Format first_era = new ar.com.mylback.dal.entities.Format();
+        ar.com.mylback.dal.entities.cards.Format first_era = new ar.com.mylback.dal.entities.cards.Format();
         first_era.setName("first_era");
         formatEntity.add(first_era);
 
-        ar.com.mylback.dal.entities.Format unified = new ar.com.mylback.dal.entities.Format();
+        ar.com.mylback.dal.entities.cards.Format unified = new ar.com.mylback.dal.entities.cards.Format();
         unified.setName("unified");
         formatEntity.add(unified);
 
         return formatEntity;
     }
 
-    public static List<ar.com.mylback.dal.entities.KeyWord> mapKeyWordsToEntity(CardsData cardsData) {
-        List<ar.com.mylback.dal.entities.KeyWord> keyWordsEntities = new ArrayList<>();
+    public static List<ar.com.mylback.dal.entities.cards.KeyWord> mapKeyWordsToEntity(CardsData cardsData) {
+        List<ar.com.mylback.dal.entities.cards.KeyWord> keyWordsEntities = new ArrayList<>();
 
         if (cardsData != null) {
             for (KeyWord keyWord : cardsData.getAllKeyWords()) {
-                ar.com.mylback.dal.entities.KeyWord entityKeyWord = new ar.com.mylback.dal.entities.KeyWord();
+                ar.com.mylback.dal.entities.cards.KeyWord entityKeyWord = new ar.com.mylback.dal.entities.cards.KeyWord();
 
                 entityKeyWord.setName(keyWord.getTitle());
                 entityKeyWord.setDefinition(keyWord.getDefinition());
@@ -182,12 +182,12 @@ public class MapToEntities {
         return keyWordsEntities;
     }
 
-    public static List<ar.com.mylback.dal.entities.Race> mapRaceToEntity(CardsData cardsData) {
-        List<ar.com.mylback.dal.entities.Race> racesEntity = new ArrayList<>();
+    public static List<ar.com.mylback.dal.entities.cards.Race> mapRaceToEntity(CardsData cardsData) {
+        List<ar.com.mylback.dal.entities.cards.Race> racesEntity = new ArrayList<>();
 
         if (cardsData != null) {
             for (Race race : cardsData.getRaces()) {
-                ar.com.mylback.dal.entities.Race entityRace = new ar.com.mylback.dal.entities.Race();
+                ar.com.mylback.dal.entities.cards.Race entityRace = new ar.com.mylback.dal.entities.cards.Race();
 
                 entityRace.setName(race.getName());
 
@@ -197,12 +197,12 @@ public class MapToEntities {
         return racesEntity;
     }
 
-    public static List<ar.com.mylback.dal.entities.Rarity> mapRarityToEntity(CardsData cardsData) {
-        List<ar.com.mylback.dal.entities.Rarity> raritiesEntity = new ArrayList<>();
+    public static List<ar.com.mylback.dal.entities.cards.Rarity> mapRarityToEntity(CardsData cardsData) {
+        List<ar.com.mylback.dal.entities.cards.Rarity> raritiesEntity = new ArrayList<>();
 
         if (cardsData != null) {
             for (Rarity rarity : cardsData.getRarities()) {
-                ar.com.mylback.dal.entities.Rarity entityRarity = new ar.com.mylback.dal.entities.Rarity();
+                ar.com.mylback.dal.entities.cards.Rarity entityRarity = new ar.com.mylback.dal.entities.cards.Rarity();
 
                 entityRarity.setName(rarity.getName());
 
@@ -212,12 +212,12 @@ public class MapToEntities {
         return raritiesEntity;
     }
 
-    public static List<ar.com.mylback.dal.entities.Type> mapTypeToEntity(CardsData cardsData) {
-        List<ar.com.mylback.dal.entities.Type> typesEntity = new ArrayList<>();
+    public static List<ar.com.mylback.dal.entities.cards.Type> mapTypeToEntity(CardsData cardsData) {
+        List<ar.com.mylback.dal.entities.cards.Type> typesEntity = new ArrayList<>();
 
         if (cardsData != null) {
             for (Type type : cardsData.getTypes()) {
-                ar.com.mylback.dal.entities.Type entityType = new ar.com.mylback.dal.entities.Type();
+                ar.com.mylback.dal.entities.cards.Type entityType = new ar.com.mylback.dal.entities.cards.Type();
 
                 entityType.setName(type.getName());
 

@@ -1,7 +1,7 @@
 package ar.com.test.loaddata;
 
 import ar.com.mylback.utils.MylException;
-import ar.com.mylback.dal.crud.DAOCardProperties;
+import ar.com.mylback.dal.crud.cards.DAOCardProperties;
 import ar.com.test.loaddata.models.Card;
 import ar.com.test.loaddata.models.CardDetails;
 import ar.com.test.loaddata.models.CardsData;
@@ -20,7 +20,7 @@ public class ImageBatchUploader {
     private static final int MAX_RETRIES = 3;
     private static final long BACKOFF_MS = 500;
 
-    public static void loadImagesFromCardsInDataBase(CardsData cardsData, List<ar.com.mylback.dal.entities.Card> entityCards) {
+    public static void loadImagesFromCardsInDataBase(CardsData cardsData, List<ar.com.mylback.dal.entities.cards.Card> entityCards) {
         ImageProcessor imageProcessor = new ImageProcessor();
         ExecutorService exec = Executors.newFixedThreadPool(THREADS);
         CompletionService<Card> completion = new ExecutorCompletionService<>(exec);
@@ -34,7 +34,7 @@ public class ImageBatchUploader {
         Gson gson = new Gson();
 
         try {
-            for (ar.com.mylback.dal.entities.Card card : entityCards) {
+            for (ar.com.mylback.dal.entities.cards.Card card : entityCards) {
                 completion.submit(() -> {
                     Card jsonCompleteCard = null;
                     boolean success = false;
@@ -87,7 +87,7 @@ public class ImageBatchUploader {
         }
     }
 
-    public static Card getMatchCardFromJson(ar.com.mylback.dal.entities.Card entityCard, CardsData cardsData, Gson gson) {
+    public static Card getMatchCardFromJson(ar.com.mylback.dal.entities.cards.Card entityCard, CardsData cardsData, Gson gson) {
         // Filter by everything except collection
         List<Card> possibleCards = cardsData.getCards().stream()
                 .filter(c -> c.getName().equalsIgnoreCase(entityCard.getName()))
@@ -142,7 +142,7 @@ public class ImageBatchUploader {
 
     public static void loadImages(CardsData cardsData) {
         ImageProcessor imageProcessor = new ImageProcessor();
-        DAOCardProperties<ar.com.mylback.dal.entities.Card, String> cardDao = new DAOCardProperties<>(ar.com.mylback.dal.entities.Card.class);
+        DAOCardProperties<ar.com.mylback.dal.entities.cards.Card, String> cardDao = new DAOCardProperties<>(ar.com.mylback.dal.entities.cards.Card.class);
 
         ExecutorService exec = Executors.newFixedThreadPool(THREADS);
         CompletionService<Card> completion = new ExecutorCompletionService<>(exec);
@@ -157,7 +157,7 @@ public class ImageBatchUploader {
                     boolean success = false;
                     for (int attempt = 1; attempt <= MAX_RETRIES; attempt++) {
                         try {
-                            ar.com.mylback.dal.entities.Card entityCard = cardDao.findByName(card.getName());
+                            ar.com.mylback.dal.entities.cards.Card entityCard = cardDao.findByName(card.getName());
                             loadImage(card, imageProcessor, entityCard);
                             success = true;
                             break;
@@ -193,7 +193,7 @@ public class ImageBatchUploader {
         }
     }
 
-    private static void loadImage(Card card, ImageProcessor imageProcessor, ar.com.mylback.dal.entities.Card entityCard) throws MylException {
+    private static void loadImage(Card card, ImageProcessor imageProcessor, ar.com.mylback.dal.entities.cards.Card entityCard) throws MylException {
         if (entityCard != null) {
             BufferedImage bufferedImage = imageProcessor.getImageFromApi(card.getEd_edid(), card.getEdid());
             if (bufferedImage != null) {

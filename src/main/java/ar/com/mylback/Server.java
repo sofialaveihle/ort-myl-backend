@@ -1,5 +1,7 @@
 package ar.com.mylback;
 
+import ar.com.mylback.auth.FirebaseInitializer;
+
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 
@@ -13,6 +15,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class Server {
     public static void main(String[] args) throws IOException {
+        FirebaseInitializer.init();
+
         int port = 3000;
 
         // Create HTTP server
