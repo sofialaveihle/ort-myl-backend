@@ -2,20 +2,10 @@ package ar.com.mylback.controller;
 
 import ar.com.mylback.auth.FirebaseAuthValidator;
 import ar.com.mylback.auth.FirebaseInitializer;
-import ar.com.mylback.dal.crud.cards.DAO;
 import ar.com.mylback.dal.crud.users.DAOPlayer;
-import ar.com.mylback.dal.crud.users.DAOStore;
 import ar.com.mylback.dal.entities.users.Player;
-import ar.com.mylback.dal.entities.users.Store;
-import ar.com.mylback.utils.entitydtomappers.users.PlayerMapper;
-import ar.com.mylback.utils.entitydtomappers.users.StoreMapper;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.UserRecord;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import users.PlayerDTO;
-import users.PlayerRegisterDTO;
-import users.StoreDTO;
 
 public class UserController {
 

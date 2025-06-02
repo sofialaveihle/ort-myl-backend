@@ -163,7 +163,7 @@ public class RequestProcessor implements Runnable {
                     String body = new String(exchange.getRequestBody().readAllBytes());
 
                     switch (path) {
-                        case "/api/auth/registerPlayer" -> {
+                        case "/api/players/register" -> {
                             try {
                                 String response = new AuthController().registerPlayer(body);
                                 int statusCode = response.contains("\"error\"") ? 400 : 200;
@@ -173,7 +173,7 @@ public class RequestProcessor implements Runnable {
                             }
                         }
 
-                        case "/api/auth/registerStore" -> {
+                        case "/api/stores/register" -> {
                             try {
                                 String response = new AuthController().registerStore(body);
                                 int statusCode = response.contains("\"error\"") ? 400 : 200;
@@ -216,7 +216,7 @@ public class RequestProcessor implements Runnable {
 
                 }  else if (method.equals("PUT")) {
                     switch (path) {
-                        case "/api/stores/update" -> {
+                        case "/api/stores" -> {
                             String body = new String(exchange.getRequestBody().readAllBytes());
                             String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
 
@@ -228,7 +228,7 @@ public class RequestProcessor implements Runnable {
                                 sendResponse(exchange, 500, "{\"error\": \"Error inesperado al actualizar tienda: " + e.getMessage() + "\"}");
                             }
                         }
-                        case "/api/players/update" -> {
+                        case "/api/players" -> {
                             String body = new String(exchange.getRequestBody().readAllBytes());
                             String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
 
@@ -242,9 +242,9 @@ public class RequestProcessor implements Runnable {
                         }
                         default -> sendResponse(exchange, 404, "PUT endpoint not found");
                     }
-                }   else if (method.equals("DELETE")) {
+                } else if (method.equals("DELETE")) {
                     switch (path) {
-                        case "/api/auth/deleteAccount" -> {
+                        case "/api/users" -> {
                             try {
                                 String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
                                 String response = new AuthController().deleteAccount(authHeader);
