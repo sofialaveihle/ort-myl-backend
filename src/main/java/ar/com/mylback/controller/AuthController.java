@@ -42,79 +42,62 @@ public class AuthController {
             return "{\"message\": \"Usuario registrado correctamente\"}";
     }
 
-    public String loginUser(String authHeader) {
+    public String loginUser(String authHeader) throws Exception {
         FirebaseInitializer.init();
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return "{\"error\": \"Token inválido o ausente\"}";
+            throw new Exception("Token inválido o ausente");
         }
 
-        try {
-            String uid = FirebaseAuthValidator.validateAndGetUid(authHeader);
+        String uid = FirebaseAuthValidator.validateAndGetUid(authHeader);
 
-
-            // Validar que el correo esté verificado en Firebase
-            UserRecord userRecord = FirebaseAuth.getInstance().getUser(uid);
-            if (!userRecord.isEmailVerified()) {
-                return "{\"error\": \"Debe verificar su correo electrónico antes de iniciar sesión\"}";
-            }
-
-            // Buscar en tabla de players
-            DAOPlayer daoPlayer = new DAOPlayer();
-            Player player = daoPlayer.findByUuidWithAssociations(uid);
-            if (player != null) {
-                PlayerDTO dto = PlayerMapper.toDTO(player);
-                return gson.toJson(dto);
-            }
-
-            // Buscar en tabla de tiendas
-            DAOStore daoStore = new DAOStore();
-            Store store = daoStore.findByUuid(uid);
-            if (store != null) {
-                if (!store.isValid()) {
-                    return "{\"error\": \"La tienda aún no fue validada por el equipo de MyL\"}";
-                }
-                StoreDTO dto = StoreMapper.toDTO(store);
-                return gson.toJson(dto);
-            }
-
-            return "{\"error\": \"No existe un usuario asociado a este UID\"}";
-
-        } catch (Exception e) {
-            System.err.println("Error en login: " + e.getMessage());
-            return "{\"error\": \"Error durante el login: " + e.getMessage() + "\"}";
+        UserRecord userRecord = FirebaseAuth.getInstance().getUser(uid);
+        if (!userRecord.isEmailVerified()) {
+            throw new Exception("Debe verificar su correo electrónico antes de iniciar sesión");
         }
+
+        DAOPlayer daoPlayer = new DAOPlayer();
+        Player player = daoPlayer.findByUuidWithAssociations(uid);
+        if (player != null) {
+            PlayerDTO dto = PlayerMapper.toDTO(player);
+            return gson.toJson(dto);
+        }
+
+        DAOStore daoStore = new DAOStore();
+        Store store = daoStore.findByUuid(uid);
+        if (store != null) {
+            if (!store.isValid()) {
+                throw new Exception("La tienda aún no fue validada por el equipo de MyL");
+            }
+            StoreDTO dto = StoreMapper.toDTO(store);
+            return gson.toJson(dto);
+        }
+
+        throw new Exception("No existe un usuario asociado a este UID");
     }
 
-    public String deleteAccount(String authHeader) {
+    public String deleteAccount(String authHeader) throws Exception {
         FirebaseInitializer.init();
 
-        try {
-            String uid = FirebaseAuthValidator.validateAndGetUid(authHeader);
+        String uid = FirebaseAuthValidator.validateAndGetUid(authHeader);
 
-            // Reviso en tabla de players si esta el UID
-            DAOPlayer daoPlayer = new DAOPlayer();
-            Player player = daoPlayer.findByUuidWithAssociations(uid);
-            if (player != null) {
-                daoPlayer.delete(player);
-                FirebaseAuth.getInstance().deleteUser(uid);
-                return "{\"message\": \"Cuenta de jugador eliminada correctamente\"}";
-            }
-
-            // Reviso en tabla de tiendas si esta el UID
-            DAOStore daoStore = new DAOStore();
-            Store store = daoStore.findByUuid(uid);
-            if (store != null) {
-                daoStore.delete(store);
-                FirebaseAuth.getInstance().deleteUser(uid);
-                return "{\"message\": \"Cuenta de tienda eliminada correctamente\"}";
-            }
-
-            return "{\"error\": \"No se encontró una cuenta con ese UID\"}";
-        } catch (Exception e) {
-            System.err.println("Error al eliminar cuenta: " + e.getMessage());
-            return "{\"error\": \"No se pudo eliminar la cuenta\"}";
+        DAOPlayer daoPlayer = new DAOPlayer();
+        Player player = daoPlayer.findByUuidWithAssociations(uid);
+        if (player != null) {
+            daoPlayer.delete(player);
+            FirebaseAuth.getInstance().deleteUser(uid);
+            return "{\"message\": \"Cuenta de jugador eliminada correctamente\"}";
         }
+
+        DAOStore daoStore = new DAOStore();
+        Store store = daoStore.findByUuid(uid);
+        if (store != null) {
+            daoStore.delete(store);
+            FirebaseAuth.getInstance().deleteUser(uid);
+            return "{\"message\": \"Cuenta de tienda eliminada correctamente\"}";
+        }
+
+        throw new Exception("No se encontró una cuenta con ese UID");
     }
 
 }

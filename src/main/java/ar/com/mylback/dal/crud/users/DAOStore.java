@@ -12,16 +12,10 @@ public class DAOStore extends DAOUser<Store> {
         super(Store.class);
     }
 
-    public List<Store> findAllValid() throws MylException {
+    public List<Store> findAllByValidationStatus(boolean isValid) throws MylException {
         return HibernateUtil.withSession(session ->
-                session.createQuery("FROM Store s WHERE s.isValid = true", Store.class)
-                        .getResultList()
-        );
-    }
-
-    public List<Store> findAllUnverified() throws MylException {
-        return HibernateUtil.withSession(session ->
-                session.createQuery("FROM Store s WHERE s.isValid = false", Store.class)
+                session.createQuery("FROM Store s WHERE s.isValid = :isValid", Store.class)
+                        .setParameter("isValid", isValid)
                         .getResultList()
         );
     }

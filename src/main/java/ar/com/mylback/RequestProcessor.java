@@ -117,53 +117,42 @@ public class RequestProcessor implements Runnable {
                             sendResponse(exchange, 500, "Error parser keywords: " + e.getMessage());
                         }
 
-                    } else if (path.equals("/api/validStores")) {
+                    } else if (path.equals("/api/stores")) {
                         try {
+                            String query = exchange.getRequestURI().getQuery();
+                            boolean isValid = true; // default
+                            String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
+
+                            if (query != null) {
+                                for (String param : query.split("&")) {
+                                    String[] keyValue = param.split("=");
+                                    if (keyValue.length == 2 && keyValue[0].equals("valid")) {
+                                        isValid = Boolean.parseBoolean(keyValue[1]);
+                                    }
+                                }
+                            }
+
                             StoreController controller = new StoreController();
-                            String response = controller.getAllValidStores();
+                            String response = controller.getStoresByValidation(authHeader, isValid);
                             sendResponse(exchange, 200, response);
+
                         } catch (Exception e) {
                             sendResponse(exchange, 500, "Error al obtener tiendas: " + e.getMessage());
                         }
-
-                    } else if (path.matches("/api/validStores/[^/]+")) {
+                    } else if (path.matches("/api/stores/[^/]+")) {
                         try {
                             String[] parts = path.split("/");
                             if (parts.length >= 4) {
                                 String uuid = parts[3];
+                                String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
                                 StoreController controller = new StoreController();
-                                String response = controller.getStoreByUuid(uuid);
+                                String response = controller.getStoreByUuid(uuid, authHeader);
                                 sendResponse(exchange, 200, response);
                             } else {
                                 sendResponse(exchange, 400, "UUID inválido");
                             }
                         } catch (Exception e) {
                             sendResponse(exchange, 500, "Error al obtener tienda por UUID: " + e.getMessage());
-                        }
-
-                    } else if (path.equals("/api/stores/unverified")) {
-                        try {
-                            String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
-                            StoreController controller = new StoreController();
-                            String response = controller.getAllUnverifiedStores(authHeader);
-                            sendResponse(exchange, 200, response);
-                        } catch (Exception e) {
-                            sendResponse(exchange, 500, "Error al obtener tiendas no verificadas: " + e.getMessage());
-                        }
-                    } else if (path.matches("/api/stores/unverified/[^/]+")) {
-                        try {
-                            String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
-                            String[] parts = path.split("/");
-                            if (parts.length >= 4) {
-                                String uuid = parts[3];
-                                StoreController controller = new StoreController();
-                                String response = controller.getUnverifiedStoreByUuid(uuid, authHeader);
-                                sendResponse(exchange, 200, response);
-                            } else {
-                                sendResponse(exchange, 400, "UUID inválido");
-                            }
-                        } catch (Exception e) {
-                            sendResponse(exchange, 500, "Error al obtener tienda no verificada: " + e.getMessage());
                         }
                     }
                     else {
@@ -198,10 +187,10 @@ public class RequestProcessor implements Runnable {
                             try {
                                 String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
                                 String response = new AuthController().loginUser(authHeader);
-                                int statusCode = response.contains("\"error\"") ? 401 : 200;
+                                int statusCode = response.contains("\"error\"") ? 400 : 200;
                                 sendResponse(exchange, statusCode, response);
                             } catch (Exception e) {
-                                sendResponse(exchange, 500, "Error en login: " + e.getMessage());
+                                sendResponse(exchange, 500, "{\"error\": \"Error en login: " + e.getMessage() + "\"}");
                             }
                         }
 
@@ -213,9 +202,12 @@ public class RequestProcessor implements Runnable {
 
                                 StoreController controller = new StoreController();
                                 String response = controller.validateStore(uuid, authHeader);
-                                sendResponse(exchange, 200, response);
+
+                                int statusCode = response.contains("\"error\"") ? 400 : 200;
+                                sendResponse(exchange, statusCode, response);
+
                             } catch (Exception e) {
-                                sendResponse(exchange, 500, "Error al validar tienda: " + e.getMessage());
+                                sendResponse(exchange, 500, "{\"error\": \"Error al validar tienda: " + e.getMessage() + "\"}");
                             }
                         }
 
@@ -228,15 +220,25 @@ public class RequestProcessor implements Runnable {
                             String body = new String(exchange.getRequestBody().readAllBytes());
                             String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
 
-                            String response = new StoreController().updateStore(body, authHeader);
-                            sendResponse(exchange, 200, response);
+                            try {
+                                String response = new StoreController().updateStore(body, authHeader);
+                                int statusCode = response.contains("\"error\"") ? 400 : 200;
+                                sendResponse(exchange, statusCode, response);
+                            } catch (Exception e) {
+                                sendResponse(exchange, 500, "{\"error\": \"Error inesperado al actualizar tienda: " + e.getMessage() + "\"}");
+                            }
                         }
                         case "/api/players/update" -> {
                             String body = new String(exchange.getRequestBody().readAllBytes());
                             String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
 
-                            String response = new UserController().updatePlayer(body, authHeader);
-                            sendResponse(exchange, 200, response);
+                            try {
+                                String response = new UserController().updatePlayer(body, authHeader);
+                                int statusCode = response.contains("\"error\"") ? 400 : 200;
+                                sendResponse(exchange, statusCode, response);
+                            } catch (Exception e) {
+                                sendResponse(exchange, 500, "{\"error\": \"Error inesperado al actualizar jugador: " + e.getMessage() + "\"}");
+                            }
                         }
                         default -> sendResponse(exchange, 404, "PUT endpoint not found");
                     }
@@ -246,9 +248,10 @@ public class RequestProcessor implements Runnable {
                             try {
                                 String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
                                 String response = new AuthController().deleteAccount(authHeader);
-                                sendResponse(exchange, 200, response);
+                                int statusCode = response.contains("\"error\"") ? 400 : 200;
+                                sendResponse(exchange, statusCode, response);
                             } catch (Exception e) {
-                                sendResponse(exchange, 500, "Error al eliminar cuenta: " + e.getMessage());
+                                sendResponse(exchange, 500, "{\"error\": \"Error al eliminar cuenta: " + e.getMessage() + "\"}");
                             }
                         }
                         default -> sendResponse(exchange, 404, "PUT endpoint not found");

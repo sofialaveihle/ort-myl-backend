@@ -29,4 +29,13 @@ public class StoreMapper {
         return store;
     }
 
+    public static void updateEntityFromDTO(StoreDTO dto, Store store) {
+        if (dto != null && store != null) {
+            UserMapper.fromDTO(dto, store); // uuid, email, name
+            store.setAddress(dto.getAddress());
+            store.setPhoneNumber(dto.getPhoneNumber());
+            store.setUrl(dto.getUrl());
+        }
+    }
+
 }

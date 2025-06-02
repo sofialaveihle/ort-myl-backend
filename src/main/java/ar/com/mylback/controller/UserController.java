@@ -21,30 +21,22 @@ public class UserController {
 
     private static final Gson gson = new Gson();
 
-    public String updatePlayer(String requestBody, String authHeader) {
+    public String updatePlayer(String requestBody, String authHeader) throws Exception {
         FirebaseInitializer.init();
 
-        try {
-            String uid = FirebaseAuthValidator.validateAndGetUid(authHeader);
+        String uid = FirebaseAuthValidator.validateAndGetUid(authHeader);
 
-            PlayerDTO dto = gson.fromJson(requestBody, PlayerDTO.class);
+        PlayerDTO dto = gson.fromJson(requestBody, PlayerDTO.class);
+        DAOPlayer daoPlayer = new DAOPlayer();
+        Player player = daoPlayer.findByUuid(uid);
 
-            DAOPlayer daoPlayer = new DAOPlayer();
-            Player player = daoPlayer.findByUuid(uid);
-
-            if (player == null) {
-                return "{\"error\": \"Jugador no encontrado\"}";
-            }
-
-            player.setName(dto.getName());
-
-            daoPlayer.update(player);
-
-            return "{\"message\": \"Jugador actualizado correctamente\"}";
-
-        } catch (Exception e) {
-            System.err.println("Error al actualizar jugador: " + e.getMessage());
-            return "{\"error\": \"Error al actualizar jugador: " + e.getMessage() + "\"}";
+        if (player == null) {
+            return "{\"error\": \"Jugador no encontrado\"}";
         }
+
+        player.setName(dto.getName());
+        daoPlayer.update(player);
+
+        return "{\"message\": \"Jugador actualizado correctamente\"}";
     }
 }
