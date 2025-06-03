@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 @MappedSuperclass
 public abstract class User {
     @Id
-    @Column(name = "uuid", nullable = false, length = 100)
+    @Column(name = "uuid", nullable = false, length = 128)
     private String uuid;
 
     @Column(name = "email", nullable = false, length = 100)

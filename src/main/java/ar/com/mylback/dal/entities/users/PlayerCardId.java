@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Embeddable
 public class PlayerCardId {
-    @Column(name = "player_uuid", length = 100)
+    @Column(name = "player_uuid", length = 128)
     private String playerUuid;
 
     @Column(name = "card_id")

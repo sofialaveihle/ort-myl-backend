@@ -11,4 +11,13 @@ public class UserMapper {
             userDTO.setName(user.getName());
         }
     }
+
+    public static void fromDTO(UserDTO userDTO, final User user) {
+        if (userDTO != null && user != null) {
+            user.setUuid(userDTO.getUuid());
+            user.setEmail(userDTO.getEmail());
+            user.setName(userDTO.getName());
+        }
+    }
+
 }

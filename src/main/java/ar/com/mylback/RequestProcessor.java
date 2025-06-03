@@ -4,6 +4,8 @@ import ar.com.mylback.controller.*;
 import ar.com.mylback.utils.InjectorProvider;
 import ar.com.mylback.utils.MylException;
 import ar.com.mylback.utils.QueryString;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.sun.net.httpserver.HttpExchange;
 
 import java.io.IOException;
@@ -11,8 +13,8 @@ import java.io.OutputStream;
 import java.util.concurrent.BlockingQueue;
 
 public class RequestProcessor implements Runnable {
-    private final BlockingQueue<HttpExchange> queue;
     private static volatile boolean isRunning;
+    private final BlockingQueue<HttpExchange> queue;
     private final InjectorProvider injectorProvider;
 
     public RequestProcessor(BlockingQueue<HttpExchange> queue, InjectorProvider injectorProvider) throws MylException {
@@ -22,6 +24,14 @@ public class RequestProcessor implements Runnable {
         } else {
             throw new MylException(MylException.Type.GENERIC_ERROR);
         }
+    }
+
+    public static void stop() {
+        isRunning = false;
+    }
+
+    public static void start() {
+        isRunning = true;
     }
 
     @Override
@@ -125,46 +135,148 @@ public class RequestProcessor implements Runnable {
                         } catch (Exception e) {
                             sendResponse(exchange, 500, "Error parser keywords: " + e.getMessage());
                         }
+                    } else if (path.equals("/api/stores")) {
+                        try {
+                            String query = exchange.getRequestURI().getQuery();
+                            boolean isValid = true; // default
+                            String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
+
+                            if (query != null) {
+                                for (String param : query.split("&")) {
+                                    String[] keyValue = param.split("=");
+                                    if (keyValue.length == 2 && keyValue[0].equals("valid")) {
+                                        isValid = Boolean.parseBoolean(keyValue[1]);
+                                    }
+                                }
+                            }
+
+                            StoreController controller = new StoreController();
+                            String response = controller.getStoresByValidation(authHeader, isValid);
+                            sendResponse(exchange, 200, response);
+
+                        } catch (Exception e) {
+                            sendResponse(exchange, 500, "Error al obtener tiendas: " + e.getMessage());
+                        }
+                    } else if (path.matches("/api/stores/[^/]+")) {
+                        try {
+                            String[] parts = path.split("/");
+                            if (parts.length >= 4) {
+                                String uuid = parts[3];
+                                String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
+                                StoreController controller = new StoreController();
+                                String response = controller.getStoreByUuid(uuid, authHeader);
+                                sendResponse(exchange, 200, response);
+                            } else {
+                                sendResponse(exchange, 400, "UUID inválido");
+                            }
+                        } catch (Exception e) {
+                            sendResponse(exchange, 500, "Error al obtener tienda por UUID: " + e.getMessage());
+                        }
                     } else {
                         sendResponse(exchange, 404, "404 Not Found");
                     }
+
                 } else if (method.equals("POST")) {
                     String body = new String(exchange.getRequestBody().readAllBytes());
 
                     switch (path) {
-                        case "/api/users/register" -> {
+                        case "/api/players/register" -> {
                             try {
-                                String response = new UserController().registerUser(body);
-                                sendResponse(exchange, 200, response);
+                                String response = new AuthController().registerPlayer(body);
+                                int statusCode = response.contains("\"error\"") ? 400 : 200;
+                                sendResponse(exchange, statusCode, response);
                             } catch (Exception e) {
                                 sendResponse(exchange, 500, "Error al registrar usuario: " + e.getMessage());
                             }
                         }
                         case "/api/stores/register" -> {
                             try {
-                                String response = new StoreController().registerStore(body);
-                                sendResponse(exchange, 200, response);
+                                String response = new AuthController().registerStore(body);
+                                int statusCode = response.contains("\"error\"") ? 400 : 200;
+                                sendResponse(exchange, statusCode, response);
                             } catch (Exception e) {
                                 sendResponse(exchange, 500, "Error al registrar tienda: " + e.getMessage());
                             }
                         }
+
+                        case "/api/auth/login" -> {
+                            try {
+                                String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
+                                String response = new AuthController().loginUser(authHeader);
+                                int statusCode = response.contains("\"error\"") ? 400 : 200;
+                                sendResponse(exchange, statusCode, response);
+                            } catch (Exception e) {
+                                sendResponse(exchange, 500, "{\"error\": \"Error en login: " + e.getMessage() + "\"}");
+                            }
+                        }
+
+                        case "/api/admin/stores/validate" -> {
+                            try {
+                                String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
+                                JsonObject json = new Gson().fromJson(body, JsonObject.class);
+                                String uuid = json.get("uuid").getAsString();
+
+                                StoreController controller = new StoreController();
+                                String response = controller.validateStore(uuid, authHeader);
+
+                                int statusCode = response.contains("\"error\"") ? 400 : 200;
+                                sendResponse(exchange, statusCode, response);
+
+                            } catch (Exception e) {
+                                sendResponse(exchange, 500, "{\"error\": \"Error al validar tienda: " + e.getMessage() + "\"}");
+                            }
+                        }
+
                         default -> sendResponse(exchange, 404, "POST endpoint not found");
+
+                    } else if (method.equals("PUT")) {
+                        switch (path) {
+                            case "/api/stores" -> {
+                                String body = new String(exchange.getRequestBody().readAllBytes());
+                                String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
+
+                                try {
+                                    String response = new StoreController().updateStore(body, authHeader);
+                                    int statusCode = response.contains("\"error\"") ? 400 : 200;
+                                    sendResponse(exchange, statusCode, response);
+                                } catch (Exception e) {
+                                    sendResponse(exchange, 500, "{\"error\": \"Error inesperado al actualizar tienda: " + e.getMessage() + "\"}");
+                                }
+                            }
+                            case "/api/players" -> {
+                                String body = new String(exchange.getRequestBody().readAllBytes());
+                                String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
+
+                                try {
+                                    String response = new UserController().updatePlayer(body, authHeader);
+                                    int statusCode = response.contains("\"error\"") ? 400 : 200;
+                                    sendResponse(exchange, statusCode, response);
+                                } catch (Exception e) {
+                                    sendResponse(exchange, 500, "{\"error\": \"Error inesperado al actualizar jugador: " + e.getMessage() + "\"}");
+                                }
+                            }
+                            default -> sendResponse(exchange, 404, "PUT endpoint not found");
+                        }
+                    } else if (method.equals("DELETE")) {
+                        switch (path) {
+                            case "/api/users" -> {
+                                try {
+                                    String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
+                                    String response = new AuthController().deleteAccount(authHeader);
+                                    int statusCode = response.contains("\"error\"") ? 400 : 200;
+                                    sendResponse(exchange, statusCode, response);
+                                } catch (Exception e) {
+                                    sendResponse(exchange, 500, "{\"error\": \"Error al eliminar cuenta: " + e.getMessage() + "\"}");
+                                }
+                            }
+                            default -> sendResponse(exchange, 404, "PUT endpoint not found");
+                        }
                     }
                 }
-
-
             } catch (Exception e) {
                 System.err.println(e.getMessage());
             }
         }
-    }
-
-    public static void stop() {
-        isRunning = false;
-    }
-
-    public static void start() {
-        isRunning = true;
     }
 
     private void sendResponse(HttpExchange exchange, int status, String body) throws IOException {

@@ -9,7 +9,7 @@ import java.util.Set;
 @Table(name = "players")
 @AttributeOverrides({
         @AttributeOverride(name = "uuid",
-                column = @Column(name = "player_uuid", length = 100)
+                column = @Column(name = "player_uuid", length = 128)
         )
 })
 public class Player extends User {
