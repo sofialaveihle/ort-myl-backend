@@ -13,8 +13,8 @@ import java.io.OutputStream;
 import java.util.concurrent.BlockingQueue;
 
 public class RequestProcessor implements Runnable {
-    private static volatile boolean isRunning;
     private final BlockingQueue<HttpExchange> queue;
+    private static volatile boolean isRunning;
     private final InjectorProvider injectorProvider;
 
     public RequestProcessor(BlockingQueue<HttpExchange> queue, InjectorProvider injectorProvider) throws MylException {
@@ -24,14 +24,6 @@ public class RequestProcessor implements Runnable {
         } else {
             throw new MylException(MylException.Type.GENERIC_ERROR);
         }
-    }
-
-    public static void stop() {
-        isRunning = false;
-    }
-
-    public static void start() {
-        isRunning = true;
     }
 
     @Override
@@ -135,6 +127,7 @@ public class RequestProcessor implements Runnable {
                         } catch (Exception e) {
                             sendResponse(exchange, 500, "Error parser keywords: " + e.getMessage());
                         }
+
                     } else if (path.equals("/api/stores")) {
                         try {
                             String query = exchange.getRequestURI().getQuery();
@@ -172,7 +165,8 @@ public class RequestProcessor implements Runnable {
                         } catch (Exception e) {
                             sendResponse(exchange, 500, "Error al obtener tienda por UUID: " + e.getMessage());
                         }
-                    } else {
+                    }
+                    else {
                         sendResponse(exchange, 404, "404 Not Found");
                     }
 
@@ -189,6 +183,7 @@ public class RequestProcessor implements Runnable {
                                 sendResponse(exchange, 500, "Error al registrar usuario: " + e.getMessage());
                             }
                         }
+
                         case "/api/stores/register" -> {
                             try {
                                 String response = new AuthController().registerStore(body);
@@ -228,55 +223,64 @@ public class RequestProcessor implements Runnable {
                         }
 
                         default -> sendResponse(exchange, 404, "POST endpoint not found");
+                    }
 
-                    } else if (method.equals("PUT")) {
-                        switch (path) {
-                            case "/api/stores" -> {
-                                String body = new String(exchange.getRequestBody().readAllBytes());
-                                String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
+                }  else if (method.equals("PUT")) {
+                    switch (path) {
+                        case "/api/stores" -> {
+                            String body = new String(exchange.getRequestBody().readAllBytes());
+                            String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
 
-                                try {
-                                    String response = new StoreController().updateStore(body, authHeader);
-                                    int statusCode = response.contains("\"error\"") ? 400 : 200;
-                                    sendResponse(exchange, statusCode, response);
-                                } catch (Exception e) {
-                                    sendResponse(exchange, 500, "{\"error\": \"Error inesperado al actualizar tienda: " + e.getMessage() + "\"}");
-                                }
+                            try {
+                                String response = new StoreController().updateStore(body, authHeader);
+                                int statusCode = response.contains("\"error\"") ? 400 : 200;
+                                sendResponse(exchange, statusCode, response);
+                            } catch (Exception e) {
+                                sendResponse(exchange, 500, "{\"error\": \"Error inesperado al actualizar tienda: " + e.getMessage() + "\"}");
                             }
-                            case "/api/players" -> {
-                                String body = new String(exchange.getRequestBody().readAllBytes());
-                                String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
-
-                                try {
-                                    String response = new UserController().updatePlayer(body, authHeader);
-                                    int statusCode = response.contains("\"error\"") ? 400 : 200;
-                                    sendResponse(exchange, statusCode, response);
-                                } catch (Exception e) {
-                                    sendResponse(exchange, 500, "{\"error\": \"Error inesperado al actualizar jugador: " + e.getMessage() + "\"}");
-                                }
-                            }
-                            default -> sendResponse(exchange, 404, "PUT endpoint not found");
                         }
-                    } else if (method.equals("DELETE")) {
-                        switch (path) {
-                            case "/api/users" -> {
-                                try {
-                                    String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
-                                    String response = new AuthController().deleteAccount(authHeader);
-                                    int statusCode = response.contains("\"error\"") ? 400 : 200;
-                                    sendResponse(exchange, statusCode, response);
-                                } catch (Exception e) {
-                                    sendResponse(exchange, 500, "{\"error\": \"Error al eliminar cuenta: " + e.getMessage() + "\"}");
-                                }
+                        case "/api/players" -> {
+                            String body = new String(exchange.getRequestBody().readAllBytes());
+                            String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
+
+                            try {
+                                String response = new UserController().updatePlayer(body, authHeader);
+                                int statusCode = response.contains("\"error\"") ? 400 : 200;
+                                sendResponse(exchange, statusCode, response);
+                            } catch (Exception e) {
+                                sendResponse(exchange, 500, "{\"error\": \"Error inesperado al actualizar jugador: " + e.getMessage() + "\"}");
                             }
-                            default -> sendResponse(exchange, 404, "PUT endpoint not found");
                         }
+                        default -> sendResponse(exchange, 404, "PUT endpoint not found");
+                    }
+                } else if (method.equals("DELETE")) {
+                    switch (path) {
+                        case "/api/users" -> {
+                            try {
+                                String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
+                                String response = new AuthController().deleteAccount(authHeader);
+                                int statusCode = response.contains("\"error\"") ? 400 : 200;
+                                sendResponse(exchange, statusCode, response);
+                            } catch (Exception e) {
+                                sendResponse(exchange, 500, "{\"error\": \"Error al eliminar cuenta: " + e.getMessage() + "\"}");
+                            }
+                        }
+                        default -> sendResponse(exchange, 404, "PUT endpoint not found");
                     }
                 }
+
             } catch (Exception e) {
                 System.err.println(e.getMessage());
             }
         }
+    }
+
+    public static void stop() {
+        isRunning = false;
+    }
+
+    public static void start() {
+        isRunning = true;
     }
 
     private void sendResponse(HttpExchange exchange, int status, String body) throws IOException {
