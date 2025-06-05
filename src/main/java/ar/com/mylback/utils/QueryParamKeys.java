@@ -11,7 +11,8 @@ public enum QueryParamKeys {
     TYPE_ID("typeId"),
     RACE_ID("raceId"),
     FORMAT_ID("formatId"),
-    KEY_WORD_ID("keyWordId");
+    KEY_WORD_ID("keyWordId"),
+    VALID("valid");
 
     private final String key;
 

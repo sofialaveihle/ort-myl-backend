@@ -3,10 +3,11 @@ package ar.com.mylback.utils.entitydtomappers.cards;
 import ar.com.mylback.dal.entities.cards.Type;
 import ar.com.myldtos.cards.TypeDTO;
 
-public class TypeMapper {
-    public static TypeDTO toDTO(Type type) {
+public class TypeMapper extends CardPropertiesMapper<Type, TypeDTO> {
+    @Override
+    public TypeDTO toDTO(Type type) {
         TypeDTO typeDTO = new TypeDTO();
-        CardPropertiesMapper.toDTO(type, typeDTO);
+        super.toDTO(type, typeDTO);
         return typeDTO;
     }
 }

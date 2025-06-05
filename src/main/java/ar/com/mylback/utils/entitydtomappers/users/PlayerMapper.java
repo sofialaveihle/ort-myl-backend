@@ -6,14 +6,22 @@ import users.PlayerDTO;
 
 import java.util.stream.Collectors;
 
-public class PlayerMapper {
+public class PlayerMapper extends UserMapper {
+    private final DeckMapper deckMapper;
+    private final PlayerCardMapper playerCardMapper;
+
+    public PlayerMapper(DeckMapper deckMapper, PlayerCardMapper playerCardMapper) {
+        this.deckMapper = deckMapper;
+        this.playerCardMapper = playerCardMapper;
+    }
+
     @NotNull
-    public static PlayerDTO toDTO(Player player) {
+    public PlayerDTO toDTO(Player player) {
         PlayerDTO playerDTO = new PlayerDTO();
         if (player != null) {
-            UserMapper.toDTO(player, playerDTO);
-            playerDTO.setDecks(player.getDecks().stream().map(DeckMapper::toDTO).collect(Collectors.toSet()));
-            playerDTO.setCards(player.getPlayerCards().stream().map(PlayerCardMapper::toDTO).collect(Collectors.toSet()));
+            super.toDTO(player, playerDTO);
+            playerDTO.setDecks(player.getDecks().stream().map(deckMapper::toDTO).collect(Collectors.toSet()));
+            playerDTO.setCards(player.getPlayerCards().stream().map(playerCardMapper::toDTO).collect(Collectors.toSet()));
         }
         return playerDTO;
     }

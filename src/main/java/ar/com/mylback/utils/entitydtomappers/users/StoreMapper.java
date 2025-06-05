@@ -3,11 +3,11 @@ package ar.com.mylback.utils.entitydtomappers.users;
 import ar.com.mylback.dal.entities.users.Store;
 import users.StoreDTO;
 
-public class StoreMapper {
-    public static StoreDTO toDTO(Store store) {
+public class StoreMapper extends UserMapper {
+    public StoreDTO toDTO(Store store) {
         StoreDTO storeDTO = new StoreDTO();
         if (store != null) {
-            UserMapper.toDTO(store, storeDTO);
+            super.toDTO(store, storeDTO);
             storeDTO.setUrl(store.getUrl());
             storeDTO.setPhoneNumber(store.getPhoneNumber());
             storeDTO.setAddress(store.getAddress());
@@ -16,11 +16,11 @@ public class StoreMapper {
         return storeDTO;
     }
 
-    public static Store fromDTO(StoreDTO dto) {
+    public Store fromDTO(StoreDTO dto) {
         if (dto == null) return null;
 
         Store store = new Store();
-        UserMapper.fromDTO(dto, store);
+        super.fromDTO(dto, store);
         store.setAddress(dto.getAddress());
         store.setPhoneNumber(dto.getPhoneNumber());
         store.setUrl(dto.getUrl());
@@ -29,9 +29,9 @@ public class StoreMapper {
         return store;
     }
 
-    public static void updateEntityFromDTO(StoreDTO dto, Store store) {
+    public void updateEntityFromDTO(StoreDTO dto, final Store store) {
         if (dto != null && store != null) {
-            UserMapper.fromDTO(dto, store); // uuid, email, name
+            super.fromDTO(dto, store); // uuid, email, name
             store.setAddress(dto.getAddress());
             store.setPhoneNumber(dto.getPhoneNumber());
             store.setUrl(dto.getUrl());

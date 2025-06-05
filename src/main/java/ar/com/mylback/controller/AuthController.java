@@ -7,6 +7,7 @@ import ar.com.mylback.dal.crud.users.DAOPlayer;
 import ar.com.mylback.dal.crud.users.DAOStore;
 import ar.com.mylback.dal.entities.users.Player;
 import ar.com.mylback.dal.entities.users.Store;
+import ar.com.mylback.utils.MylException;
 import ar.com.mylback.utils.entitydtomappers.users.PlayerMapper;
 import ar.com.mylback.utils.entitydtomappers.users.StoreMapper;
 import ar.com.mylback.utils.entitydtomappers.users.UserMapper;
@@ -17,13 +18,30 @@ import users.PlayerDTO;
 import users.StoreDTO;
 
 public class AuthController {
+    private final Gson gson;
+    private final DAOPlayer daoPlayer;
+    private final DAOStore daoStore;
+    private final UserMapper userMapper;
+    private final StoreMapper storeMapper;
+    private final PlayerMapper playerMapper;
 
-    private static final Gson gson = new Gson();
+    public AuthController(Gson gson, DAOPlayer daoPlayer, DAOStore daoStore, UserMapper userMapper, PlayerMapper playerMapper, StoreMapper storeMapper) throws MylException {
+        if (gson != null && daoPlayer != null && daoStore != null && userMapper != null && storeMapper != null && playerMapper != null) {
+            this.gson = gson;
+            this.daoPlayer = daoPlayer;
+            this.daoStore = daoStore;
+            this.userMapper = userMapper;
+            this.storeMapper = storeMapper;
+            this.playerMapper = playerMapper;
+        } else {
+            throw new MylException(MylException.Type.NULL_PARAMETER);
+        }
+    }
 
     public String registerStore(String requestBody) throws Exception {
 
             StoreDTO dto = gson.fromJson(requestBody, StoreDTO.class);
-            Store store = StoreMapper.fromDTO(dto);
+            Store store = storeMapper.fromDTO(dto);
 
             new DAO<>(Store.class).save(store);
 
@@ -35,9 +53,9 @@ public class AuthController {
             PlayerDTO dto = gson.fromJson(requestBody, PlayerDTO.class);
 
             Player player = new Player();
-            UserMapper.fromDTO(dto, player);
+            userMapper.fromDTO(dto, player);
 
-            new DAO<>(Player.class).save(player);
+            daoPlayer.save(player);
 
             return "{\"message\": \"Usuario registrado correctamente\"}";
     }
@@ -56,20 +74,18 @@ public class AuthController {
             throw new Exception("Debe verificar su correo electrónico antes de iniciar sesión");
         }
 
-        DAOPlayer daoPlayer = new DAOPlayer();
         Player player = daoPlayer.findByUuidWithAssociations(uid);
         if (player != null) {
-            PlayerDTO dto = PlayerMapper.toDTO(player);
+            PlayerDTO dto = playerMapper.toDTO(player);
             return gson.toJson(dto);
         }
 
-        DAOStore daoStore = new DAOStore();
         Store store = daoStore.findByUuid(uid);
         if (store != null) {
             if (!store.isValid()) {
                 throw new Exception("La tienda aún no fue validada por el equipo de MyL");
             }
-            StoreDTO dto = StoreMapper.toDTO(store);
+            StoreDTO dto = storeMapper.toDTO(store);
             return gson.toJson(dto);
         }
 
@@ -81,7 +97,6 @@ public class AuthController {
 
         String uid = FirebaseAuthValidator.validateAndGetUid(authHeader);
 
-        DAOPlayer daoPlayer = new DAOPlayer();
         Player player = daoPlayer.findByUuidWithAssociations(uid);
         if (player != null) {
             daoPlayer.delete(player);
@@ -89,7 +104,6 @@ public class AuthController {
             return "{\"message\": \"Cuenta de jugador eliminada correctamente\"}";
         }
 
-        DAOStore daoStore = new DAOStore();
         Store store = daoStore.findByUuid(uid);
         if (store != null) {
             daoStore.delete(store);
@@ -99,5 +113,4 @@ public class AuthController {
 
         throw new Exception("No se encontró una cuenta con ese UID");
     }
-
 }

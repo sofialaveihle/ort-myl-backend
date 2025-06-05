@@ -4,7 +4,7 @@ import ar.com.mylback.dal.entities.users.User;
 import users.UserDTO;
 
 public class UserMapper {
-    public static void toDTO(User user, final UserDTO userDTO) {
+    public void toDTO(User user, final UserDTO userDTO) {
         if (userDTO != null && user != null) {
             userDTO.setUuid(user.getUuid());
             userDTO.setEmail(user.getEmail());
@@ -12,12 +12,11 @@ public class UserMapper {
         }
     }
 
-    public static void fromDTO(UserDTO userDTO, final User user) {
+    public void fromDTO(UserDTO userDTO, final User user) {
         if (userDTO != null && user != null) {
             user.setUuid(userDTO.getUuid());
             user.setEmail(userDTO.getEmail());
             user.setName(userDTO.getName());
         }
     }
-
 }

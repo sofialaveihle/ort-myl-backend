@@ -15,20 +15,12 @@ public class ImageUrlGenerator {
     private static final String BUCKET_NAME = "myl-images-bucket";
     private static final Region REGION = Region.US_EAST_1;
     private static final long TIMEOUT = 5; // minutes
-    private static ImageUrlGenerator instance;
 
-    private ImageUrlGenerator() {
+    public ImageUrlGenerator() {
         this.presigner = S3Presigner.builder()
                 .region(REGION)
                 .credentialsProvider(DefaultCredentialsProvider.create())
                 .build();
-    }
-
-    public static ImageUrlGenerator getInstance() {
-        if (instance == null) {
-            instance = new ImageUrlGenerator();
-        }
-        return instance;
     }
 
     public String generatePresignedUrl(UUID imageUuid) {
