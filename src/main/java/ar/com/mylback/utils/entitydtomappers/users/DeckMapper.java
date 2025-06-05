@@ -7,15 +7,23 @@ import users.DeckDTO;
 import java.util.stream.Collectors;
 
 public class DeckMapper {
+//    private final PlayerMapper playerMapper;
+    private final DeckCardMapper deckCardMapper;
+
+    public DeckMapper(/*PlayerMapper playerMapper, */DeckCardMapper deckMapper) {
+//        this.playerMapper = playerMapper;
+        this.deckCardMapper = deckMapper;
+    }
+
     @NotNull
-    public static DeckDTO toDTO(Deck deck) {
+    public DeckDTO toDTO(Deck deck) {
         DeckDTO deckDTO = new DeckDTO();
         if (deck != null) {
             deckDTO.setId(deck.getId());
             deckDTO.setName(deck.getName());
-            deckDTO.setPlayer(PlayerMapper.toDTO(deck.getPlayer()));
+//            deckDTO.setPlayer(playerMapper.toDTO(deck.getPlayer()));
 
-            deckDTO.setCards(deck.getCards().stream().map(DeckCardMapper::toDTO).collect(Collectors.toSet()));
+            deckDTO.setCards(deck.getCards().stream().map(deckCardMapper::toDTO).collect(Collectors.toSet()));
         }
         return deckDTO;
     }

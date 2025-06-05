@@ -6,11 +6,17 @@ import jakarta.validation.constraints.NotNull;
 import users.DeckCardDTO;
 
 public class DeckCardMapper {
+    private final CardMapper cardMapper;
+
+    public DeckCardMapper(CardMapper cardMapper) {
+        this.cardMapper = cardMapper;
+    }
+
     @NotNull
-    public static DeckCardDTO toDTO(DeckCard deckCard) {
+    public DeckCardDTO toDTO(DeckCard deckCard) {
         DeckCardDTO deckCardDTO = new DeckCardDTO();
         if (deckCard != null) {
-//            deckCardDTO.setCard(CardMapper.toDTO(deckCard.getCard()));
+            deckCardDTO.setCard(cardMapper.toDTO(deckCard.getCard()));
             deckCardDTO.setQuantity(deckCard.getQuantity());
         }
         return deckCardDTO;

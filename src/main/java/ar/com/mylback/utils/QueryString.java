@@ -45,8 +45,8 @@ public class QueryString {
     }
 
     @NotNull
-    private List<String> getValues(String key) {
-        List<String> values = query.get(key);
+    private List<String> getValues(QueryParamKeys key) {
+        List<String> values = query.get(key.key());
         if (values == null) {
             values = new ArrayList<>();
         }
@@ -54,7 +54,7 @@ public class QueryString {
     }
 
     @NotNull
-    private List<Integer> getIds(String key) {
+    private List<Integer> getIds(QueryParamKeys key) {
         return getValues(key).stream()
                 .filter(e -> e != null && !e.isEmpty())
                 .map(e -> {
@@ -70,11 +70,11 @@ public class QueryString {
 
     @NotNull
     public List<String> getNames() {
-        return getValues(QueryParamKeys.NAME.key());
+        return getValues(QueryParamKeys.NAME);
     }
 
     public int getPage() {
-        List<String> values = getValues(QueryParamKeys.PAGE.key());
+        List<String> values = getValues(QueryParamKeys.PAGE);
         if (values.isEmpty()) {
             return 0;
         }
@@ -82,7 +82,7 @@ public class QueryString {
     }
 
     public int getPageSize() {
-        List<String> values = getValues(QueryParamKeys.PAGE_SIZE.key());
+        List<String> values = getValues(QueryParamKeys.PAGE_SIZE);
         if (values.isEmpty()) {
             return 0;
         }
@@ -90,36 +90,36 @@ public class QueryString {
     }
 
     public List<Integer> getCosts() {
-        return getIds(QueryParamKeys.COST.key());
+        return getIds(QueryParamKeys.COST);
     }
 
     public List<Integer> getDamages() {
-        return getIds(QueryParamKeys.DAMAGE.key());
+        return getIds(QueryParamKeys.DAMAGE);
     }
 
     public List<Integer> getCollectionsIds() {
-        return getIds(QueryParamKeys.COLLECTION_ID.key());
+        return getIds(QueryParamKeys.COLLECTION_ID);
     }
 
     public List<Integer> getRaritiesIds() {
-        return getIds(QueryParamKeys.RARITY_ID.key());
+        return getIds(QueryParamKeys.RARITY_ID);
     }
 
 
     public List<Integer> getTypesIds() {
-        return getIds(QueryParamKeys.TYPE_ID.key());
+        return getIds(QueryParamKeys.TYPE_ID);
     }
 
     public List<Integer> getRacesIds() {
-        return getIds(QueryParamKeys.RACE_ID.key());
+        return getIds(QueryParamKeys.RACE_ID);
     }
 
     public List<Integer> getFormatsIds() {
-        return getIds(QueryParamKeys.FORMAT_ID.key());
+        return getIds(QueryParamKeys.FORMAT_ID);
     }
 
     public List<Integer> getKeyWordsIds() {
-        return getIds(QueryParamKeys.KEY_WORD_ID.key());
+        return getIds(QueryParamKeys.KEY_WORD_ID);
     }
 
     private Map<String, List<Integer>> mapOfNonEmptyLists() {
@@ -139,5 +139,9 @@ public class QueryString {
                         (u, v) -> u            // in case of duplicate keys (shouldn’t happen)
                 ));
 
+    }
+
+    public boolean getValid() {
+        return query.get(QueryParamKeys.VALID.key()).isEmpty() || Boolean.parseBoolean(query.get(QueryParamKeys.VALID.key()).get(0));
     }
 }

@@ -1,7 +1,12 @@
 package ar.com.mylback.utils;
 
 import ar.com.mylback.dal.crud.cards.DAOCard;
+import ar.com.mylback.dal.crud.users.DAOPlayer;
+import ar.com.mylback.dal.crud.users.DAOStore;
 import ar.com.mylback.utils.entitydtomappers.cards.*;
+import ar.com.mylback.utils.entitydtomappers.users.PlayerMapper;
+import ar.com.mylback.utils.entitydtomappers.users.StoreMapper;
+import ar.com.mylback.utils.entitydtomappers.users.UserMapper;
 import com.google.gson.Gson;
 
 import java.util.function.Supplier;
@@ -9,7 +14,12 @@ import java.util.function.Supplier;
 public class InjectorProvider {
     private final Supplier<Gson> gsonSupplier;
     private final Supplier<DAOCard<Integer>> daoCardSupplier;
+    private final Supplier<DAOPlayer> daoPlayerSupplier;
+    private final Supplier<DAOStore> daoStoreSupplier;
     private final Supplier<CardMapper> cardMapperSupplier;
+    private final Supplier<UserMapper> userMapperSupplier;
+    private final Supplier<PlayerMapper> playerMapperSupplier;
+    private final Supplier<StoreMapper> storeMapperSupplier;
     private final Supplier<CollectionMapper> collectionMapperSupplier;
     private final Supplier<RarityMapper> rarityMapperSupplier;
     private final Supplier<FormatMapper> formatMapperSupplier;
@@ -19,7 +29,12 @@ public class InjectorProvider {
 
     public InjectorProvider(Supplier<Gson> gsonSupplier,
                             Supplier<DAOCard<Integer>> daoCardSupplier,
+                            Supplier<DAOPlayer> daoPlayerSupplier,
+                            Supplier<DAOStore> daoStoreSupplier,
                             Supplier<CardMapper> cardMapperSupplier,
+                            Supplier<UserMapper> userMapperSupplier,
+                            Supplier<PlayerMapper> playerMapperSupplier,
+                            Supplier<StoreMapper> storeMapperSupplier,
                             Supplier<CollectionMapper> collectionMapperSupplier,
                             Supplier<RarityMapper> rarityMapperSupplier,
                             Supplier<FormatMapper> formatMapperSupplier,
@@ -29,7 +44,12 @@ public class InjectorProvider {
 
         if (gsonSupplier == null ||
                 daoCardSupplier == null ||
+                daoPlayerSupplier == null ||
+                daoStoreSupplier == null ||
                 cardMapperSupplier == null ||
+                userMapperSupplier == null ||
+                playerMapperSupplier == null ||
+                storeMapperSupplier == null ||
                 collectionMapperSupplier == null ||
                 rarityMapperSupplier == null ||
                 formatMapperSupplier == null ||
@@ -41,7 +61,12 @@ public class InjectorProvider {
 
         this.gsonSupplier = gsonSupplier;
         this.daoCardSupplier = daoCardSupplier;
+        this.daoPlayerSupplier = daoPlayerSupplier;
+        this.daoStoreSupplier = daoStoreSupplier;
         this.cardMapperSupplier = cardMapperSupplier;
+        this.userMapperSupplier = userMapperSupplier;
+        this.playerMapperSupplier = playerMapperSupplier;
+        this.storeMapperSupplier = storeMapperSupplier;
         this.collectionMapperSupplier = collectionMapperSupplier;
         this.rarityMapperSupplier = rarityMapperSupplier;
         this.formatMapperSupplier = formatMapperSupplier;
@@ -50,39 +75,59 @@ public class InjectorProvider {
         this.typeMapperSupplier = typeMapperSupplier;
     }
 
-    public Gson getGsonSupplier() {
+    public Gson getGson() {
         return gsonSupplier.get();
     }
 
-    public DAOCard<Integer> getDaoCardSupplier() {
+    public DAOCard<Integer> getDaoCard() {
         return daoCardSupplier.get();
     }
 
-    public CardMapper getCardMapperSupplier() {
+    public DAOPlayer getDaoPlayer() {
+        return daoPlayerSupplier.get();
+    }
+
+    public DAOStore getDaoStore() {
+        return daoStoreSupplier.get();
+    }
+
+    public CardMapper getCardMapper() {
         return cardMapperSupplier.get();
     }
 
-    public CollectionMapper getCollectionMapperSupplier() {
+    public CollectionMapper getCollectionMapper() {
         return collectionMapperSupplier.get();
     }
 
-    public RarityMapper getRarityMapperSupplier() {
+    public RarityMapper getRarityMapper() {
         return rarityMapperSupplier.get();
     }
 
-    public FormatMapper getFormatMapperSupplier() {
+    public UserMapper getUserMapper() {
+        return userMapperSupplier.get();
+    }
+
+    public PlayerMapper getPlayerMapper() {
+        return playerMapperSupplier.get();
+    }
+
+    public StoreMapper getStoreMapper() {
+        return storeMapperSupplier.get();
+    }
+
+    public FormatMapper getFormatMapper() {
         return formatMapperSupplier.get();
     }
 
-    public KeyWordMapper getKeyWordMapperSupplier() {
+    public KeyWordMapper getKeyWordMapper() {
         return keyWordMapperSupplier.get();
     }
 
-    public RaceMapper getRaceMapperSupplier() {
+    public RaceMapper getRaceMapper() {
         return raceMapperSupplier.get();
     }
 
-    public TypeMapper getTypeMapperSupplier() {
+    public TypeMapper getTypeMapper() {
         return typeMapperSupplier.get();
     }
 }

@@ -3,10 +3,13 @@ package ar.com.mylback;
 import ar.com.mylback.auth.FirebaseInitializer;
 
 import ar.com.mylback.dal.crud.cards.DAOCard;
+import ar.com.mylback.dal.crud.users.DAOPlayer;
+import ar.com.mylback.dal.crud.users.DAOStore;
 import ar.com.mylback.utils.ImageUrlGenerator;
 import ar.com.mylback.utils.InjectorProvider;
 import ar.com.mylback.utils.MylException;
 import ar.com.mylback.utils.entitydtomappers.cards.*;
+import ar.com.mylback.utils.entitydtomappers.users.*;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
@@ -33,41 +36,10 @@ public class Server {
 
         // Thread pool for worker threads
         ExecutorService workerPool = Executors.newFixedThreadPool(4); // for processing
-
-        // singleton dependencies
-        Gson gson = new Gson();
-        ImageUrlGenerator imageUrlGenerator = new ImageUrlGenerator();
-
-        // singleton mappers
-        CollectionMapper collectionMapper   = new CollectionMapper();
-        RarityMapper rarityMapper           = new RarityMapper();
-        TypeMapper typeMapper               = new TypeMapper();
-        RaceMapper raceMapper               = new RaceMapper();
-        FormatMapper formatMapper           = new FormatMapper();
-        KeyWordMapper keyWordMapper         = new KeyWordMapper();
-
         try {
-            CardMapper cardMapper = new CardMapper(
-                    imageUrlGenerator,
-                    collectionMapper,
-                    rarityMapper,
-                    typeMapper,
-                    raceMapper,
-                    formatMapper,
-                    keyWordMapper
-            );
 
-            InjectorProvider injectorProvider = new InjectorProvider(
-                    () -> gson,
-                    DAOCard::new,
-                    () -> cardMapper,
-                    () -> collectionMapper,
-                    () -> rarityMapper,
-                    () -> formatMapper,
-                    () -> keyWordMapper,
-                    () -> raceMapper,
-                    () -> typeMapper
-            );
+            // singleton dependencies
+            InjectorProvider injectorProvider = buildInjectorProvider();
 
             // Start workers
             for (int i = 0; i < 4; i++) {
@@ -110,5 +82,52 @@ public class Server {
                 }
             }
         }).start();
+    }
+
+    private static InjectorProvider buildInjectorProvider() throws MylException {
+        Gson gson = new Gson();
+        ImageUrlGenerator imageUrlGenerator = new ImageUrlGenerator();
+
+        // singleton mappers
+        CollectionMapper collectionMapper   = new CollectionMapper();
+        RarityMapper rarityMapper           = new RarityMapper();
+        TypeMapper typeMapper               = new TypeMapper();
+        RaceMapper raceMapper               = new RaceMapper();
+        FormatMapper formatMapper           = new FormatMapper();
+        KeyWordMapper keyWordMapper         = new KeyWordMapper();
+
+        CardMapper cardMapper = new CardMapper(
+                imageUrlGenerator,
+                collectionMapper,
+                rarityMapper,
+                typeMapper,
+                raceMapper,
+                formatMapper,
+                keyWordMapper
+        );
+
+        UserMapper userMapper = new UserMapper();
+        DeckCardMapper deckCardMapper = new DeckCardMapper(cardMapper);
+        DeckMapper deckMapper = new DeckMapper(deckCardMapper);
+        PlayerCardMapper playerCardMapper = new PlayerCardMapper();
+        PlayerMapper playerMapper = new PlayerMapper(deckMapper, playerCardMapper);
+        StoreMapper storeMapper = new StoreMapper();
+
+        return new InjectorProvider(
+                () -> gson,
+                DAOCard::new,
+                DAOPlayer::new,
+                DAOStore::new,
+                () -> cardMapper,
+                () -> userMapper,
+                () -> playerMapper,
+                () -> storeMapper,
+                () -> collectionMapper,
+                () -> rarityMapper,
+                () -> formatMapper,
+                () -> keyWordMapper,
+                () -> raceMapper,
+                () -> typeMapper
+        );
     }
 }
