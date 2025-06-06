@@ -1,4 +1,4 @@
-package ar.com.mylback.utils;
+package ar.com.mylback.utils.url;
 
 import jakarta.validation.constraints.NotNull;
 

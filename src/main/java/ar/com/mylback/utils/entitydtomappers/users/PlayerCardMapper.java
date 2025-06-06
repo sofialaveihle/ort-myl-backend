@@ -3,7 +3,7 @@ package ar.com.mylback.utils.entitydtomappers.users;
 import ar.com.mylback.dal.entities.users.PlayerCard;
 //import ar.com.mylback.utils.entitydtomappers.cards.CardMapper;
 import jakarta.validation.constraints.NotNull;
-import users.PlayerCardDTO;
+import ar.com.myldtos.users.PlayerCardDTO;
 
 public class PlayerCardMapper {
     @NotNull

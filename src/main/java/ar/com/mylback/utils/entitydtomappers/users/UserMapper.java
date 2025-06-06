@@ -1,7 +1,7 @@
 package ar.com.mylback.utils.entitydtomappers.users;
 
 import ar.com.mylback.dal.entities.users.User;
-import users.UserDTO;
+import ar.com.myldtos.users.UserDTO;
 
 public class UserMapper {
     public void toDTO(User user, final UserDTO userDTO) {

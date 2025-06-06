@@ -1,6 +1,6 @@
 package ar.com.mylback;
 
-import ar.com.mylback.auth.FirebaseInitializer;
+import ar.com.mylback.auth.FirebaseAuthValidator;
 
 import ar.com.mylback.dal.crud.cards.DAOCard;
 import ar.com.mylback.dal.crud.users.DAOPlayer;
@@ -24,8 +24,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class Server {
     public static void main(String[] args) throws IOException {
-        FirebaseInitializer.init();
-
         int port = 3000;
 
         // Create HTTP server
@@ -86,6 +84,8 @@ public class Server {
 
     private static InjectorProvider buildInjectorProvider() throws MylException {
         Gson gson = new Gson();
+
+        FirebaseAuthValidator firebaseAuthValidator = new FirebaseAuthValidator();
         ImageUrlGenerator imageUrlGenerator = new ImageUrlGenerator();
 
         // singleton mappers
@@ -115,6 +115,7 @@ public class Server {
 
         return new InjectorProvider(
                 () -> gson,
+                () -> firebaseAuthValidator,
                 DAOCard::new,
                 DAOPlayer::new,
                 DAOStore::new,

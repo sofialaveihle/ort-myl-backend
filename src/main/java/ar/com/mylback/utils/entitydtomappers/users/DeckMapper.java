@@ -2,7 +2,7 @@ package ar.com.mylback.utils.entitydtomappers.users;
 
 import ar.com.mylback.dal.entities.users.Deck;
 import jakarta.validation.constraints.NotNull;
-import users.DeckDTO;
+import ar.com.myldtos.users.DeckDTO;
 
 import java.util.stream.Collectors;
 

@@ -1,7 +1,7 @@
 package ar.com.mylback.utils.entitydtomappers.users;
 
 import ar.com.mylback.dal.entities.users.Store;
-import users.StoreDTO;
+import ar.com.myldtos.users.StoreDTO;
 
 public class StoreMapper extends UserMapper {
     public StoreDTO toDTO(Store store) {

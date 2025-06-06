@@ -1,5 +1,6 @@
 package ar.com.mylback.utils;
 
+import ar.com.mylback.auth.FirebaseAuthValidator;
 import ar.com.mylback.dal.crud.cards.DAOCard;
 import ar.com.mylback.dal.crud.users.DAOPlayer;
 import ar.com.mylback.dal.crud.users.DAOStore;
@@ -13,6 +14,7 @@ import java.util.function.Supplier;
 
 public class InjectorProvider {
     private final Supplier<Gson> gsonSupplier;
+    private final Supplier<FirebaseAuthValidator> firebaseAuthValidatorSupplier;
     private final Supplier<DAOCard<Integer>> daoCardSupplier;
     private final Supplier<DAOPlayer> daoPlayerSupplier;
     private final Supplier<DAOStore> daoStoreSupplier;
@@ -28,6 +30,7 @@ public class InjectorProvider {
     private final Supplier<TypeMapper> typeMapperSupplier;
 
     public InjectorProvider(Supplier<Gson> gsonSupplier,
+                            Supplier<FirebaseAuthValidator> firebaseAuthValidatorSupplier,
                             Supplier<DAOCard<Integer>> daoCardSupplier,
                             Supplier<DAOPlayer> daoPlayerSupplier,
                             Supplier<DAOStore> daoStoreSupplier,
@@ -43,6 +46,7 @@ public class InjectorProvider {
                             Supplier<TypeMapper> typeMapperSupplier) throws MylException {
 
         if (gsonSupplier == null ||
+                firebaseAuthValidatorSupplier == null ||
                 daoCardSupplier == null ||
                 daoPlayerSupplier == null ||
                 daoStoreSupplier == null ||
@@ -60,6 +64,7 @@ public class InjectorProvider {
         }
 
         this.gsonSupplier = gsonSupplier;
+        this.firebaseAuthValidatorSupplier = firebaseAuthValidatorSupplier;
         this.daoCardSupplier = daoCardSupplier;
         this.daoPlayerSupplier = daoPlayerSupplier;
         this.daoStoreSupplier = daoStoreSupplier;
@@ -77,6 +82,10 @@ public class InjectorProvider {
 
     public Gson getGson() {
         return gsonSupplier.get();
+    }
+
+    public FirebaseAuthValidator getFirebaseAuthValidator() {
+        return firebaseAuthValidatorSupplier.get();
     }
 
     public DAOCard<Integer> getDaoCard() {

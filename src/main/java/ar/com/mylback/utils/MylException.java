@@ -34,7 +34,8 @@ public class MylException extends Exception {
         ERROR_DB_TRANSACTION(1002, "Database transaction error"),
         ERROR_LOAD_IMAGE(1003, "Error load image"),
         NULL_PARAMETER(1004, "Null parameter"),
-        EMPTY_PARAMETER(1005, "Empty parameter");
+        EMPTY_PARAMETER(1005, "Empty parameter"),
+        FIREBASE_ERROR(1006, "Firebase error");
 
         private final int code;
         private final String message;
