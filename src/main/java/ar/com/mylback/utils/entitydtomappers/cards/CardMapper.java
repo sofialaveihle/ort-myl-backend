@@ -76,4 +76,26 @@ public class CardMapper extends CardPropertiesMapper<Card, CardDTO> {
         }
         return cardDTO;
     }
+
+    @NotNull
+    public Card toEntity(CardDTO cardDTO) {
+        Card card = new Card();
+
+        if (cardDTO != null) {
+//            card.setImageUuid(); // TODO
+            card.setId(cardDTO.getId());
+            card.setName(cardDTO.getName());
+            card.setDescription(cardDTO.getDescription());
+            card.setCost(cardDTO.getCost());
+            card.setDamage(cardDTO.getDamage());
+            card.setCollection(collectionMapper.toEntity(cardDTO.getCollection()));
+            card.setRarity(rarityMapper.toEntity(cardDTO.getRarity()));
+            card.setType(typeMapper.toEntity(cardDTO.getType()));
+            card.setRace(raceMapper.toEntity(cardDTO.getRace()));
+            card.addFormats(formatMapper.toEntities(cardDTO.getFormats()));
+            card.addKeyWords(keyWordMapper.toEntities(cardDTO.getKeyWords()));
+        }
+
+        return card;
+    }
 }

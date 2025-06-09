@@ -135,12 +135,20 @@ public class Card extends CardProperties {
         this.formats = formats;
     }
 
+    public void addFormats(Set<Format> formats) {
+        this.formats.addAll(formats);
+    }
+
     public Set<KeyWord> getKeyWords() {
         return keyWords;
     }
 
     public void setKeyWords(Set<KeyWord> keyWords) {
         this.keyWords = keyWords;
+    }
+
+    public void addKeyWords(Set<KeyWord> keyWords) {
+        this.keyWords.addAll(keyWords);
     }
 
     @Override

@@ -6,12 +6,11 @@ import ar.com.mylback.utils.InjectorProvider;
 import ar.com.mylback.utils.MylException;
 import ar.com.mylback.utils.url.PathHelper;
 import ar.com.mylback.utils.url.QueryString;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.sun.net.httpserver.HttpExchange;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.BlockingQueue;
 
 public class RequestProcessor implements Runnable {
@@ -67,7 +66,7 @@ public class RequestProcessor implements Runnable {
 
                 if (exchange != null) {
                     try {
-                        String errorResponse = "{\"error\":\"An internal server error occurred. Please try again later.\"}";
+                        String errorResponse = "{\"error\":\"Ocurrió un error interno. Vuelva a intentar mas tarde.\"}";
                         sendResponse(exchange, new HttpResponse(500, errorResponse));
                     } catch (Exception responseEx) {
                         System.err.println("Failed to send unhandled error to client: " + responseEx.getMessage());
@@ -77,7 +76,7 @@ public class RequestProcessor implements Runnable {
         }
     }
 
-    private void getVerb(String path, HttpExchange exchange, QueryString queryString) throws IOException, MylException {
+    private void getVerb(String path, HttpExchange exchange, QueryString queryString) throws Exception {
         if (path.equals("/help")) {
             String response = """
                     The server is ready. Available endpoints:
@@ -118,7 +117,7 @@ public class RequestProcessor implements Runnable {
             HttpResponse response = controller.getCardsEndpoint(queryString);
             sendResponse(exchange, response);
 
-        } else if (path.matches("/api/card/\\d+")) {
+        } else if (path.matches("/api/card/\\d+$")) {
 
             int cardId = Integer.parseInt(PathHelper.getLastPathSegment(path));
             CardController controller = new CardController(
@@ -184,7 +183,7 @@ public class RequestProcessor implements Runnable {
             HttpResponse response = controller.getStoresByValidation(authHeader, queryString);
             sendResponse(exchange, response);
 
-        } else if (path.matches("/api/stores/[^/]+")) {
+        } else if (path.matches("/api/stores/[^\\n\\r/]+$")) {
 
             String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
             String uuid = PathHelper.getLastPathSegment(path);
@@ -211,120 +210,194 @@ public class RequestProcessor implements Runnable {
                     injectorProvider.getStoreMapper()).me(authHeader);
             sendResponse(exchange, response);
 
+        } else if (path.equals("/api/player/deck")) {
+
+            String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
+            HttpResponse response = new DeckController(injectorProvider.getGson(),
+                    injectorProvider.getFirebaseAuthValidator(),
+                    injectorProvider.getDaoPlayer(),
+                    injectorProvider.getDaoDeck(),
+                    injectorProvider.getDaoDeckCard(),
+                    injectorProvider.getDeckMapper(),
+                    authHeader).getPlayerDecks();
+            sendResponse(exchange, response);
+
+        } else if (path.matches("/api/player/deck/\\d+$")) {
+
+            String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
+            HttpResponse response = new DeckController(injectorProvider.getGson(),
+                    injectorProvider.getFirebaseAuthValidator(),
+                    injectorProvider.getDaoPlayer(),
+                    injectorProvider.getDaoDeck(),
+                    injectorProvider.getDaoDeckCard(),
+                    injectorProvider.getDeckMapper(),
+                    authHeader).getPlayerDeckById(Integer.parseInt(PathHelper.getLastPathSegment(path)));
+            sendResponse(exchange, response);
+
         } else {
             sendResponse(exchange, new HttpResponse(400, "Not Found"));
         }
     }
 
-    private void postVerb(HttpExchange exchange, String path) throws IOException, MylException {
+    private void postVerb(HttpExchange exchange, String path) throws Exception {
         String body = new String(exchange.getRequestBody().readAllBytes());
 
-        switch (path) {
-            case "/api/players/register" -> {
+        if (path.equals("/api/players/register")) {
 
-                try {
-                    HttpResponse response = new AuthController(injectorProvider.getGson(),
-                            injectorProvider.getFirebaseAuthValidator(),
-                            injectorProvider.getDaoPlayer(),
-                            injectorProvider.getDaoStore(),
-                            injectorProvider.getUserMapper(),
-                            injectorProvider.getPlayerMapper(),
-                            injectorProvider.getStoreMapper()).registerPlayer(body);
-                    sendResponse(exchange, response);
-                } catch (Exception e) {
-                    sendResponse(exchange, new HttpResponse(500, "Error al registrar usuario: " + e.getMessage()));
-                }
-            }
+            HttpResponse response = new AuthController(injectorProvider.getGson(),
+                    injectorProvider.getFirebaseAuthValidator(),
+                    injectorProvider.getDaoPlayer(),
+                    injectorProvider.getDaoStore(),
+                    injectorProvider.getUserMapper(),
+                    injectorProvider.getPlayerMapper(),
+                    injectorProvider.getStoreMapper()).registerPlayer(body);
+            sendResponse(exchange, response);
 
-            case "/api/stores/register" -> {
+        } else if (path.equals("/api/stores/register")) {
 
-                try {
-                    HttpResponse response = new AuthController(injectorProvider.getGson(),
-                            injectorProvider.getFirebaseAuthValidator(),
-                            injectorProvider.getDaoPlayer(),
-                            injectorProvider.getDaoStore(),
-                            injectorProvider.getUserMapper(),
-                            injectorProvider.getPlayerMapper(),
-                            injectorProvider.getStoreMapper()).registerStore(body);
-                    sendResponse(exchange, response);
-                } catch (Exception e) {
-                    sendResponse(exchange, new HttpResponse(500, "Error al registrar tienda: " + e.getMessage()));
-                }
-            }
+            HttpResponse response = new AuthController(injectorProvider.getGson(),
+                    injectorProvider.getFirebaseAuthValidator(),
+                    injectorProvider.getDaoPlayer(),
+                    injectorProvider.getDaoStore(),
+                    injectorProvider.getUserMapper(),
+                    injectorProvider.getPlayerMapper(),
+                    injectorProvider.getStoreMapper()).registerStore(body);
+            sendResponse(exchange, response);
 
-            case "/api/admin/stores/validate" -> {
+        } else if (path.equals("/api/player/deck")) {
 
-                String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
-                JsonObject json = new Gson().fromJson(body, JsonObject.class);
-                String uuid = json.get("uuid").getAsString();
+            String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
+            DeckController controller = new DeckController(injectorProvider.getGson(),
+                    injectorProvider.getFirebaseAuthValidator(),
+                    injectorProvider.getDaoPlayer(),
+                    injectorProvider.getDaoDeck(),
+                    injectorProvider.getDaoDeckCard(),
+                    injectorProvider.getDeckMapper(), authHeader);
+            HttpResponse response = controller.addDeck(body);
+            sendResponse(exchange, response);
 
-                StoreController controller = new StoreController(injectorProvider.getGson(),
-                        injectorProvider.getFirebaseAuthValidator(),
-                        injectorProvider.getDaoStore(),
-                        injectorProvider.getStoreMapper());
-                HttpResponse response = controller.validateStore(uuid, authHeader);
+        }  else if (path.matches("/api/player/deckcard/\\d+$")) {
 
-                sendResponse(exchange, response);
-            }
+            String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
+            HttpResponse response = new DeckCardController(injectorProvider.getGson(),
+                    injectorProvider.getFirebaseAuthValidator(),
+                    injectorProvider.getDaoPlayer(),
+                    injectorProvider.getDaoDeck(),
+                    injectorProvider.getDaoDeckCard(),
+                    authHeader).addCardToDecks(Integer.parseInt(PathHelper.getLastPathSegment(path)), body);
+            sendResponse(exchange, response);
 
-            default -> sendResponse(exchange, new HttpResponse(404, "POST endpoint not found"));
+        } else {
+            sendResponse(exchange, new HttpResponse(404, "POST endpoint not found"));
         }
     }
 
-    private void putVerb(String path, HttpExchange exchange) throws IOException, MylException {
-        switch (path) {
-            case "/api/stores" -> {
+    private void putVerb(String path, HttpExchange exchange) throws Exception {
+        String body = new String(exchange.getRequestBody().readAllBytes());
 
-                String body = new String(exchange.getRequestBody().readAllBytes());
-                String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
+        if (path.equals("/api/stores")) {
 
-                HttpResponse response = new StoreController(injectorProvider.getGson(),
-                        injectorProvider.getFirebaseAuthValidator(),
-                        injectorProvider.getDaoStore(),
-                        injectorProvider.getStoreMapper()).updateStore(body, authHeader);
-                sendResponse(exchange, response);
-            }
+            String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
 
-            case "/api/players" -> {
+            HttpResponse response = new StoreController(injectorProvider.getGson(),
+                    injectorProvider.getFirebaseAuthValidator(),
+                    injectorProvider.getDaoStore(),
+                    injectorProvider.getStoreMapper()).updateStore(body, authHeader);
+            sendResponse(exchange, response);
 
-                String body = new String(exchange.getRequestBody().readAllBytes());
-                String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
+        } else if (path.equals("/api/players")) {
 
-                HttpResponse response = new UserController(injectorProvider.getGson(),
-                        injectorProvider.getFirebaseAuthValidator(),
-                        injectorProvider.getDaoPlayer()).updatePlayer(body, authHeader);
-                sendResponse(exchange, response);
-            }
+            String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
 
-            default -> sendResponse(exchange, new HttpResponse(404, "PUT endpoint not found"));
+            HttpResponse response = new UserController(injectorProvider.getGson(),
+                    injectorProvider.getFirebaseAuthValidator(),
+                    injectorProvider.getDaoPlayer()).updatePlayer(body, authHeader);
+            sendResponse(exchange, response);
+
+        } else if (path.matches("/api/admin/stores/validate/[^\\n\\r/]+$")) {
+
+            String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
+            String storeUid = PathHelper.getLastPathSegment(path);
+
+            StoreController controller = new StoreController(injectorProvider.getGson(),
+                    injectorProvider.getFirebaseAuthValidator(),
+                    injectorProvider.getDaoStore(),
+                    injectorProvider.getStoreMapper());
+            HttpResponse response = controller.validateStore(storeUid, authHeader);
+            sendResponse(exchange, response);
+
+        } else if (path.matches("/api/player/deck/\\d+$")) {
+
+            String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
+            DeckController controller = new DeckController(injectorProvider.getGson(),
+                    injectorProvider.getFirebaseAuthValidator(),
+                    injectorProvider.getDaoPlayer(),
+                    injectorProvider.getDaoDeck(),
+                    injectorProvider.getDaoDeckCard(),
+                    injectorProvider.getDeckMapper(), authHeader);
+            HttpResponse response = controller.updateDeck(Integer.parseInt(PathHelper.getLastPathSegment(path)), body);
+            sendResponse(exchange, response);
+
+        } else {
+            sendResponse(exchange, new HttpResponse(404, "PUT endpoint not found"));
         }
     }
 
-    private void deleteVerb(String path, HttpExchange exchange) throws IOException {
-        switch (path) {
-            case "/api/users" -> {
-                try {
-                    String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
-                    HttpResponse response = new AuthController(injectorProvider.getGson(),
-                            injectorProvider.getFirebaseAuthValidator(),
-                            injectorProvider.getDaoPlayer(),
-                            injectorProvider.getDaoStore(),
-                            injectorProvider.getUserMapper(),
-                            injectorProvider.getPlayerMapper(),
-                            injectorProvider.getStoreMapper()).deleteAccount(authHeader);
-                    sendResponse(exchange, response);
-                } catch (Exception e) {
-                    sendResponse(exchange, new HttpResponse(500, "{\"error\": \"Error al eliminar cuenta: " + e.getMessage() + "\"}"));
-                }
-            }
-            default -> sendResponse(exchange, new HttpResponse(404, "PUT endpoint not found"));
+    private void deleteVerb(String path, HttpExchange exchange) throws Exception {
+        if  (path.equals("/api/users")) {
+
+            String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
+            HttpResponse response = new AuthController(injectorProvider.getGson(),
+                    injectorProvider.getFirebaseAuthValidator(),
+                    injectorProvider.getDaoPlayer(),
+                    injectorProvider.getDaoStore(),
+                    injectorProvider.getUserMapper(),
+                    injectorProvider.getPlayerMapper(),
+                    injectorProvider.getStoreMapper()).deleteAccount(authHeader);
+            sendResponse(exchange, response);
+
+        } else if (path.matches("/api/player/deck/\\d+$")) {
+
+            String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
+            HttpResponse response = new DeckController(
+                    injectorProvider.getGson(),
+                    injectorProvider.getFirebaseAuthValidator(),
+                    injectorProvider.getDaoPlayer(),
+                    injectorProvider.getDaoDeck(),
+                    injectorProvider.getDaoDeckCard(),
+                    injectorProvider.getDeckMapper(),
+                    authHeader
+            ).deleteDeck(Integer.parseInt(PathHelper.getLastPathSegment(path)));
+            sendResponse(exchange, response);
+
+        } else if (path.matches("/api/player/deck/\\d+/\\d+$")) { // {deckId} {cardId}
+
+            String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
+            Integer cardId = Integer.parseInt(PathHelper.getLastPathSegment(path));
+            String shortPath = PathHelper.removeLastSegment(path);
+            Integer deckId = Integer.parseInt(PathHelper.getLastPathSegment(shortPath));
+
+            HttpResponse response = new DeckCardController(
+                    injectorProvider.getGson(),
+                    injectorProvider.getFirebaseAuthValidator(),
+                    injectorProvider.getDaoPlayer(),
+                    injectorProvider.getDaoDeck(),
+                    injectorProvider.getDaoDeckCard(),
+                    authHeader
+            ).deleteCardFromDeckDeck(deckId, cardId);
+            sendResponse(exchange, response);
+
+        } else {
+            sendResponse(exchange, new HttpResponse(404, "PUT endpoint not found"));
         }
     }
 
-    private void sendResponse(HttpExchange exchange, HttpResponse response) throws IOException {
-        exchange.sendResponseHeaders(response.statusCode(), response.body().getBytes().length);
-        try (exchange; OutputStream os = exchange.getResponseBody()) {
-            os.write(response.body().getBytes());
+    private void sendResponse(HttpExchange exchange, HttpResponse response) throws MylException {
+        try (OutputStream os = exchange.getResponseBody()) {
+            exchange.sendResponseHeaders(response.statusCode(), response.body().getBytes().length);
+            os.write(response.body().getBytes(StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            throw new MylException(MylException.Type.HTTP_ERROR_SEND_RESPONSE);
         }
     }
 }

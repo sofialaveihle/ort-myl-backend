@@ -1,6 +1,6 @@
 package ar.com.test.loaddata;
 
-import ar.com.mylback.dal.crud.cards.DAO;
+import ar.com.mylback.dal.crud.DAO;
 import ar.com.mylback.dal.crud.HibernateUtil;
 import ar.com.mylback.dal.entities.cards.*;
 import ar.com.test.loaddata.deserializers.CardsDataDeserializer;

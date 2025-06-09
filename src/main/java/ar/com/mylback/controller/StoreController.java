@@ -62,7 +62,7 @@ public class StoreController {
 
     public HttpResponse getStoreByUuid(String uuid, String authHeader) {
         try {
-            Store store = daoStore.findByUuid(uuid);
+            Store store = daoStore.findByUid(uuid);
 
             if (store == null) {
                 return new HttpResponse(404, gson.toJson(new ErrorTemplateDTO(404, "Tienda no encontrada")));
@@ -82,22 +82,23 @@ public class StoreController {
         }
     }
 
-    public HttpResponse validateStore(String uuid, String authHeader) {
+    public HttpResponse validateStore(String storeUid, String authHeader) {
         try {
-            String uid = firebaseAuthValidator.validateAndGetUid(authHeader);
-
-            if (!isAdmin(uid)) {
+            String uidAdminUser = firebaseAuthValidator.validateAndGetUid(authHeader);
+            if (!isAdmin(uidAdminUser)) {
                 return new HttpResponse(403, gson.toJson(new ErrorTemplateDTO(403, "Acceso no autorizado. Solo administradores pueden validar tiendas.")));
             }
 
-            Store store = daoStore.findByUuid(uuid);
-
-            if (store == null) {
-                return new HttpResponse(404, gson.toJson(new ErrorTemplateDTO(404, "Tienda no encontrada")));
+            if (storeUid != null) {
+                Store store = daoStore.findByUid(storeUid);
+                if (store == null) {
+                    return new HttpResponse(404, gson.toJson(new ErrorTemplateDTO(404, "Tienda no encontrada")));
+                }
+                store.setValid(true);
+                daoStore.update(store);
+            } else {
+                return new HttpResponse(400, gson.toJson(new ErrorTemplateDTO(400, "Store UID invalido")));
             }
-
-            store.setValid(true);
-            daoStore.update(store);
 
             return new HttpResponse(200, gson.toJson(new SuccessTemplateDTO("Tienda validada correctamente")));
         } catch (MylException e) {
@@ -110,7 +111,7 @@ public class StoreController {
             String uid = firebaseAuthValidator.validateAndGetUid(authHeader);
             StoreDTO dto = gson.fromJson(requestBody, StoreDTO.class);
 
-            Store store = daoStore.findByUuid(uid);
+            Store store = daoStore.findByUid(uid);
 
             if (store == null) {
                 return new HttpResponse(404, gson.toJson(new ErrorTemplateDTO(404, "Tienda no encontrada")));

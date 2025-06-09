@@ -30,7 +30,7 @@ public class UserController {
             String uid = firebaseAuthValidator.validateAndGetUid(authHeader);
 
             PlayerDTO dto = gson.fromJson(requestBody, PlayerDTO.class);
-            Player player = daoPlayer.findByUuid(uid);
+            Player player = daoPlayer.findByUid(uid);
 
             if (player == null) {
                 return new HttpResponse(404, gson.toJson(new ErrorTemplateDTO(404, "Jugador no encontrado")));

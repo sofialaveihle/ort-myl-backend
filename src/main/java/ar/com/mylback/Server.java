@@ -3,6 +3,8 @@ package ar.com.mylback;
 import ar.com.mylback.auth.FirebaseAuthValidator;
 
 import ar.com.mylback.dal.crud.cards.DAOCard;
+import ar.com.mylback.dal.crud.users.DAODeck;
+import ar.com.mylback.dal.crud.users.DAODeckCard;
 import ar.com.mylback.dal.crud.users.DAOPlayer;
 import ar.com.mylback.dal.crud.users.DAOStore;
 import ar.com.mylback.utils.ImageUrlGenerator;
@@ -119,6 +121,8 @@ public class Server {
                 DAOCard::new,
                 DAOPlayer::new,
                 DAOStore::new,
+                DAODeck::new,
+                DAODeckCard::new,
                 () -> cardMapper,
                 () -> userMapper,
                 () -> playerMapper,
@@ -128,7 +132,8 @@ public class Server {
                 () -> formatMapper,
                 () -> keyWordMapper,
                 () -> raceMapper,
-                () -> typeMapper
+                () -> typeMapper,
+                () -> deckMapper
         );
     }
 }

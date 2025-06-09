@@ -7,11 +7,9 @@ import ar.com.myldtos.users.DeckDTO;
 import java.util.stream.Collectors;
 
 public class DeckMapper {
-//    private final PlayerMapper playerMapper;
     private final DeckCardMapper deckCardMapper;
 
-    public DeckMapper(/*PlayerMapper playerMapper, */DeckCardMapper deckMapper) {
-//        this.playerMapper = playerMapper;
+    public DeckMapper(DeckCardMapper deckMapper) {
         this.deckCardMapper = deckMapper;
     }
 
@@ -21,10 +19,23 @@ public class DeckMapper {
         if (deck != null) {
             deckDTO.setId(deck.getId());
             deckDTO.setName(deck.getName());
-//            deckDTO.setPlayer(playerMapper.toDTO(deck.getPlayer()));
+            deckDTO.setDescription(deck.getDescription());
 
             deckDTO.setCards(deck.getCards().stream().map(deckCardMapper::toDTO).collect(Collectors.toSet()));
         }
         return deckDTO;
+    }
+
+    @NotNull
+    public Deck toEntity(DeckDTO deckDTO) {
+        Deck deck = new Deck();
+        if (deckDTO != null) {
+            deck.setId(deckDTO.getId());
+            deck.setName(deckDTO.getName());
+            deck.setDescription(deckDTO.getDescription());
+
+            deck.setCards(deckDTO.getCards().stream().map(deckCardMapper::toEntity).collect(Collectors.toSet()));
+        }
+        return deck;
     }
 }

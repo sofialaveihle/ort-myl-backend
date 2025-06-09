@@ -1,6 +1,6 @@
 package ar.com.mylback.dal.crud.users;
 
-import ar.com.mylback.dal.crud.cards.DAO;
+import ar.com.mylback.dal.crud.DAO;
 import ar.com.mylback.dal.crud.HibernateUtil;
 import ar.com.mylback.dal.entities.users.User;
 import ar.com.mylback.utils.MylException;
@@ -26,10 +26,10 @@ public class DAOUser<T extends User> extends DAO<T, String> {
         );
     }
 
-    public T findByUuid(String uuid) throws MylException {
+    public T findByUid(String uid) throws MylException {
         return HibernateUtil.withSession(session ->
                 session.createQuery("FROM " + entityClass.getSimpleName() + " u WHERE u.uuid = :uuid", entityClass)
-                        .setParameter("uuid", uuid)
+                        .setParameter("uuid", uid)
                         .uniqueResult()
         );
     }

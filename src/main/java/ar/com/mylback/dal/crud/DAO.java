@@ -1,11 +1,11 @@
-package ar.com.mylback.dal.crud.cards;
+package ar.com.mylback.dal.crud;
 
-import ar.com.mylback.dal.crud.HibernateUtil;
 import ar.com.mylback.utils.MylException;
 import org.hibernate.Session;
 import org.hibernate.exception.ConstraintViolationException;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -25,7 +25,7 @@ public class DAO<T, ID extends Serializable> {
         HibernateUtil.withTransaction((Consumer<Session>) session -> session.persist(entity));
     }
 
-    public void save(List<T> entities) throws MylException {
+    public void save(Collection<T> entities) throws MylException {
         HibernateUtil.withTransaction(session -> {
             for (T entity : entities) {
                 try {
@@ -55,5 +55,20 @@ public class DAO<T, ID extends Serializable> {
 
     public void delete(T entity) throws MylException {
         HibernateUtil.withTransaction((Consumer<Session>) session -> session.remove(entity));
+    }
+
+    public void deleteById(ID id) throws MylException {
+        try {
+            HibernateUtil.withTransaction(session -> {
+                T entity = session.get(entityClass, id);
+                if (entity != null) {
+                    session.remove(entity);
+                } else {
+                    throw new RuntimeException("Entidad no encontrada para eliminar ID: " + id);
+                }
+            });
+        } catch (Exception e) {
+            throw new MylException(MylException.Type.NOT_FOUND, e.getMessage());
+        }
     }
 }

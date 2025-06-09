@@ -1,7 +1,7 @@
 package ar.com.mylback.controller;
 
 import ar.com.mylback.auth.FirebaseAuthValidator;
-import ar.com.mylback.dal.crud.cards.DAO;
+import ar.com.mylback.dal.crud.DAO;
 import ar.com.mylback.dal.crud.users.DAOPlayer;
 import ar.com.mylback.dal.crud.users.DAOStore;
 import ar.com.mylback.dal.entities.users.Player;
@@ -83,13 +83,13 @@ public class AuthController {
                 return new HttpResponse(403, gson.toJson(new ErrorTemplateDTO(403, "Debe verificar su correo electrónico antes de iniciar sesión")));
             }
 
-            Player player = daoPlayer.findByUuidWithAssociations(uid);
+            Player player = daoPlayer.findByUid(uid);
             if (player != null) {
                 PlayerDTO dto = playerMapper.toDTO(player);
                 return new HttpResponse(200, gson.toJson(dto));
             }
 
-            Store store = daoStore.findByUuid(uid);
+            Store store = daoStore.findByUid(uid);
             if (store != null) {
                 if (!store.isValid()) {
                     return new HttpResponse(403, gson.toJson(new ErrorTemplateDTO(403, "La tienda aún no fue validada por el equipo de MyL")));
@@ -108,14 +108,14 @@ public class AuthController {
         try {
             String uid = firebaseAuthValidator.validateAndGetUid(authHeader);
 
-            Player player = daoPlayer.findByUuidWithAssociations(uid);
+            Player player = daoPlayer.findByUidWithJoin(uid);
             if (player != null) {
                 daoPlayer.delete(player);
                 firebaseAuthValidator.deleteUser(uid);
                 return new HttpResponse(200, gson.toJson(new SuccessTemplateDTO("Cuenta de jugador eliminada correctamente")));
             }
 
-            Store store = daoStore.findByUuid(uid);
+            Store store = daoStore.findByUid(uid);
             if (store != null) {
                 daoStore.delete(store);
                 firebaseAuthValidator.deleteUser(uid);

@@ -20,6 +20,15 @@ public class PlayerMapper extends UserMapper {
         PlayerDTO playerDTO = new PlayerDTO();
         if (player != null) {
             super.toDTO(player, playerDTO);
+        }
+        return playerDTO;
+    }
+
+    @NotNull
+    public PlayerDTO toDTOWithDecks(Player player) {
+        PlayerDTO playerDTO = new PlayerDTO();
+        if (player != null) {
+            super.toDTO(player, playerDTO);
             playerDTO.setDecks(player.getDecks().stream().map(deckMapper::toDTO).collect(Collectors.toSet()));
             playerDTO.setCards(player.getPlayerCards().stream().map(playerCardMapper::toDTO).collect(Collectors.toSet()));
         }

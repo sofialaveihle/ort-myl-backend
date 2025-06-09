@@ -35,7 +35,9 @@ public class MylException extends Exception {
         ERROR_LOAD_IMAGE(1003, "Error load image"),
         NULL_PARAMETER(1004, "Null parameter"),
         EMPTY_PARAMETER(1005, "Empty parameter"),
-        FIREBASE_ERROR(1006, "Firebase error");
+        FIREBASE_ERROR(1006, "Firebase error"),
+        HTTP_ERROR_SEND_RESPONSE(1007, "HTTP error send response"),
+        NOT_FOUND(1008, "Not found");
 
         private final int code;
         private final String message;
