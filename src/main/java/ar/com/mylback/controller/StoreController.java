@@ -40,13 +40,13 @@ public class StoreController {
         try {
             // Solo verificamos el token si se están pidiendo tiendas NO validadas
             boolean isValid = queryString.getValid();
-            if (!isValid) {
+/*            if (!isValid) {
                 String uid = firebaseAuthValidator.validateAndGetUid(authHeader);
 
                 if (!isAdmin(uid)) {
                     return new HttpResponse(401, gson.toJson(new ErrorTemplateDTO(401, "Acceso no autorizado. Solo administradores pueden ver tiendas no validadas.")));
                 }
-            }
+            }*/
 
             List<Store> stores = daoStore.findAllByValidationStatus(isValid);
 
@@ -84,10 +84,10 @@ public class StoreController {
 
     public HttpResponse validateStore(String storeUid, String authHeader) {
         try {
-            String uidAdminUser = firebaseAuthValidator.validateAndGetUid(authHeader);
+/*            String uidAdminUser = firebaseAuthValidator.validateAndGetUid(authHeader);
             if (!isAdmin(uidAdminUser)) {
                 return new HttpResponse(403, gson.toJson(new ErrorTemplateDTO(403, "Acceso no autorizado. Solo administradores pueden validar tiendas.")));
-            }
+            }*/
 
             if (storeUid != null) {
                 Store store = daoStore.findByUid(storeUid);
