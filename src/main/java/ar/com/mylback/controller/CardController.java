@@ -2,9 +2,11 @@ package ar.com.mylback.controller;
 
 import ar.com.mylback.dal.crud.cards.DAOCard;
 import ar.com.mylback.dal.entities.cards.Card;
+import ar.com.mylback.utils.HttpResponse;
 import ar.com.mylback.utils.MylException;
-import ar.com.mylback.utils.QueryString;
+import ar.com.mylback.utils.url.QueryString;
 import ar.com.mylback.utils.entitydtomappers.cards.CardMapper;
+import ar.com.myldtos.ErrorTemplateDTO;
 import ar.com.myldtos.cards.CardDTO;
 import com.google.gson.Gson;
 
@@ -25,49 +27,73 @@ public class CardController {
         }
     }
 
-    public String getCardsEndpoint(QueryString queryString) throws Exception {
-        // get cards from DB
-        List<Card> cards = daoCard.findAllPagedFiltered(queryString.getPage(),
-                queryString.getPageSize(),
-                queryString.getCosts(),
-                queryString.getDamages(),
-                queryString.getCollectionsIds(),
-                queryString.getRaritiesIds(),
-                queryString.getTypesIds(),
-                queryString.getRacesIds(),
-                queryString.getFormatsIds(),
-                queryString.getKeyWordsIds(),
-                List.of());
+    public HttpResponse getCardsEndpoint(QueryString queryString) {
+        try {
+            // get cards from DB
+            List<Card> cards = daoCard.findAllPagedFiltered(queryString.getPage(),
+                    queryString.getPageSize(),
+                    queryString.getCosts(),
+                    queryString.getDamages(),
+                    queryString.getCollectionsIds(),
+                    queryString.getRaritiesIds(),
+                    queryString.getTypesIds(),
+                    queryString.getRacesIds(),
+                    queryString.getFormatsIds(),
+                    queryString.getKeyWordsIds(),
+                    List.of());
 
-        return getCardsFromList(cards);
+            if (cards == null || cards.isEmpty()) {
+                return new HttpResponse(404, gson.toJson(new ErrorTemplateDTO(404, "No se encontraron cartas con los filtros proporcionados")));
+            }
+
+            return getCardsFromList(cards);
+        } catch (MylException e) {
+            return new HttpResponse(400, gson.toJson(new ErrorTemplateDTO(400, "Error al buscar cartas", e.getMessage())));
+        }
     }
 
-    public String getCardsByName(QueryString queryString) throws Exception {
-        List<Card> cards = daoCard.findAllPagedFiltered(queryString.getPage(), queryString.getPageSize(),
-                List.of(),
-                List.of(),
-                List.of(),
-                List.of(),
-                List.of(),
-                List.of(),
-                List.of(),
-                List.of(),
-                queryString.getNames());
+    public HttpResponse getCardsByName(QueryString queryString) {
+        try {
+            List<Card> cards = daoCard.findAllPagedFiltered(queryString.getPage(), queryString.getPageSize(),
+                    List.of(),
+                    List.of(),
+                    List.of(),
+                    List.of(),
+                    List.of(),
+                    List.of(),
+                    List.of(),
+                    List.of(),
+                    queryString.getNames());
 
-        return getCardsFromList(cards);
+            if (cards == null || cards.isEmpty()) {
+                return new HttpResponse(404, gson.toJson(new ErrorTemplateDTO(404, "No se encontraron cartas con ese nombre")));
+            }
+
+            return getCardsFromList(cards);
+        } catch (MylException e) {
+            return new HttpResponse(400, gson.toJson(new ErrorTemplateDTO(400, "Error al buscar cartas", e.getMessage())));
+        }
     }
 
-    public String getCardByIDEndpoint(int id) throws Exception {
-        CardDTO cardDTO = cardMapper.toDTO(daoCard.findById(id));
+    public HttpResponse getCardById(int id) {
+        try {
+            Card card = daoCard.findById(id);
+            if (card == null) {
+                return new HttpResponse(404, gson.toJson(new ErrorTemplateDTO(404, "Carta no encontrada")));
+            }
 
-        return gson.toJson(cardDTO);
+            CardDTO cardDTO = cardMapper.toDTO(card);
+            return new HttpResponse(200, gson.toJson(cardDTO));
+        } catch (MylException e) {
+            return new HttpResponse(400, gson.toJson(new ErrorTemplateDTO(400, "Error al buscar la carta", e.getMessage())));
+        }
     }
 
-    private String getCardsFromList(List<Card> cards) {
+    private HttpResponse getCardsFromList(List<Card> cards) {
         List<CardDTO> cardDTOs = cards.stream()
                 .map(cardMapper::toDTO)
                 .toList();
 
-        return gson.toJson(cardDTOs);
+        return new HttpResponse(200, gson.toJson(cardDTOs));
     }
 }

@@ -12,13 +12,15 @@ public class Deck {
     @Column(name = "deck_id")
     private Integer id;
 
-    @Column(name = "deck_name")
+    @Column(name = "deck_name", length = 30)
     private String name;
+
+    @Column(name = "description", length = 255)
+    private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "player_uuid", nullable = false)
     private Player player;
-
 
     @OneToMany(mappedBy = "deck", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<DeckCard> cards;
@@ -37,6 +39,14 @@ public class Deck {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Player getPlayer() {

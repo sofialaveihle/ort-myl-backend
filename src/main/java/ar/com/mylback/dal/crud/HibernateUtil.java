@@ -59,7 +59,13 @@ public class HibernateUtil {
             tx.commit();
             return result;
         } catch (HibernateException e) {
-            if (tx != null) tx.rollback();
+            if (tx != null && tx.getStatus().canRollback()) {
+                try {
+                    tx.rollback();
+                } catch (Exception rollbackEx) {
+                    System.err.println("Rollback failed: " + rollbackEx.getMessage());
+                }
+            }
             System.err.println(e.getMessage());
             throw new MylException(MylException.Type.ERROR_DB_TRANSACTION, e.getMessage());
         }

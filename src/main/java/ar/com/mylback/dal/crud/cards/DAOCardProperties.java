@@ -1,5 +1,6 @@
 package ar.com.mylback.dal.crud.cards;
 
+import ar.com.mylback.dal.crud.DAO;
 import ar.com.mylback.dal.crud.HibernateUtil;
 import ar.com.mylback.utils.MylException;
 import ar.com.mylback.dal.entities.cards.CardProperties;

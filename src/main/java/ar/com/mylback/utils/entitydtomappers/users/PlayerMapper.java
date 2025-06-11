@@ -2,7 +2,7 @@ package ar.com.mylback.utils.entitydtomappers.users;
 
 import ar.com.mylback.dal.entities.users.Player;
 import jakarta.validation.constraints.NotNull;
-import users.PlayerDTO;
+import ar.com.myldtos.users.PlayerDTO;
 
 import java.util.stream.Collectors;
 
@@ -17,6 +17,15 @@ public class PlayerMapper extends UserMapper {
 
     @NotNull
     public PlayerDTO toDTO(Player player) {
+        PlayerDTO playerDTO = new PlayerDTO();
+        if (player != null) {
+            super.toDTO(player, playerDTO);
+        }
+        return playerDTO;
+    }
+
+    @NotNull
+    public PlayerDTO toDTOWithDecks(Player player) {
         PlayerDTO playerDTO = new PlayerDTO();
         if (player != null) {
             super.toDTO(player, playerDTO);
