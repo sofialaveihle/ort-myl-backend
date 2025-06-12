@@ -18,7 +18,6 @@ import com.sun.net.httpserver.HttpServer;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.Scanner;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -69,19 +68,12 @@ public class Server {
         // shut down process
         // Listen to console input in a separate thread
         // TODO call ImageUrlGenerator.close
-        new Thread(() -> {
-            Scanner scanner = new Scanner(System.in);
-            while (true) {
-                String line = scanner.nextLine();
-                if ("exit".equalsIgnoreCase(line.trim())) {
-                    server.stop(0);
-                    RequestProcessor.stop();
-                    workerPool.shutdown();
-                    System.out.println("Server stopped");
-                    break;
-                }
-            }
-        }).start();
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            System.out.println("Shutdown signal received");
+            server.stop(0);
+            RequestProcessor.stop();
+            workerPool.shutdown();
+        }));
     }
 
     private static InjectorProvider buildInjectorProvider() throws MylException {

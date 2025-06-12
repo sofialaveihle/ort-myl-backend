@@ -14,6 +14,20 @@ public class DAODeckCard extends DAO<DeckCard, DeckCardId> {
     }
 
     @Override
+    public void update(DeckCard deckCard) throws MylException {
+        HibernateUtil.withTransaction(session -> {
+            return session.createQuery("""
+                            UPDATE DeckCard dc
+                            SET dc.quantity = :newQuantity
+                            WHERE dc.id = :deckCardId
+                            """)
+                    .setParameter("newQuantity", deckCard.getQuantity())
+                    .setParameter("deckCardId", deckCard.getId())
+                    .executeUpdate();
+        });
+    }
+
+    @Override
     public void save(Collection<DeckCard> deckCards) throws MylException {
         HibernateUtil.withTransaction(session -> {
             String sql = "INSERT INTO deck_cards (deck_id, card_id, quantity) VALUES (:deckId, :cardId, :quantity)";

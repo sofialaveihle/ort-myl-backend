@@ -61,19 +61,30 @@ public class DeckCardController {
             for (AddCardToDeckDTO addCardToDeckDTO : addCardToDeckDTOs) {
                 // validate if the Deck exists
                 Deck deck = daoDeck.findById(player.getUuid(), addCardToDeckDTO.getDeckId());
-                if (deck != null && (addCardToDeckDTO.getQuantity() <= 0 || addCardToDeckDTO.getQuantity() > 3)) {
+                if (deck != null && (addCardToDeckDTO.getQuantity() > 0 || addCardToDeckDTO.getQuantity() <= 3)) {
                     DeckCard deckCard = new DeckCard();
                     DeckCardId deckCardId = new DeckCardId();
                     deckCardId.setCardId(cardId);
                     deckCardId.setDeckId(addCardToDeckDTO.getDeckId());
                     deckCard.setId(deckCardId);
                     deckCard.setQuantity(addCardToDeckDTO.getQuantity());
-                    deckCards.add(deckCard);
+                    DeckCard existingDeckCard = daoDeckCard.findById(deckCardId);
+                    if (existingDeckCard != null) {
+                        int totalQuantity = existingDeckCard.getQuantity() + deckCard.getQuantity();
+                        if (totalQuantity <= 3) {
+                            deckCard.setQuantity(totalQuantity);
+                            daoDeckCard.update(deckCard);
+                        } else {
+                            return new HttpResponse(500, gson.toJson(new ErrorTemplateDTO(500, "Max 3 cartas iguales por mazo")));
+                        }
+                    } else {
+                        deckCards.add(deckCard);
+                    }
                 } else {
                     return new HttpResponse(404, gson.toJson(new ErrorTemplateDTO(404, "Mazo invalido para cargar las cartas")));
                 }
             }
-            // TODO if the card already exists in the deck add the quantity, check if the quantity > 3
+
             daoDeckCard.save(deckCards);
 
             return new HttpResponse(200, gson.toJson(new SuccessTemplateDTO("Cartas agregadas exitosamente")));

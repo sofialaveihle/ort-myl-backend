@@ -1,14 +1,13 @@
 plugins {
     id("java")
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 group = "org.example"
 version = "1.0-SNAPSHOT"
 
-allprojects {
-    repositories {
-        mavenCentral()
-    }
+repositories {
+    mavenCentral()
 }
 
 java {
@@ -50,4 +49,14 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
+    manifest {
+        attributes["Main-Class"] = "ar.com.mylback.Server"
+    }
+
+    archiveBaseName.set("myl-backend")
+    archiveClassifier.set("all")
+    archiveVersion.set("")
 }

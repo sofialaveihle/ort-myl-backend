@@ -393,11 +393,14 @@ public class RequestProcessor implements Runnable {
     }
 
     private void sendResponse(HttpExchange exchange, HttpResponse response) throws MylException {
-        try (OutputStream os = exchange.getResponseBody()) {
-            exchange.sendResponseHeaders(response.statusCode(), response.body().getBytes().length);
-            os.write(response.body().getBytes(StandardCharsets.UTF_8));
+        try {
+            byte[] responseBytes = response.body().getBytes(StandardCharsets.UTF_8);
+            exchange.sendResponseHeaders(response.statusCode(), responseBytes.length);
+            try (OutputStream os = exchange.getResponseBody()) {
+                os.write(responseBytes);
+            }
         } catch (IOException e) {
-            throw new MylException(MylException.Type.HTTP_ERROR_SEND_RESPONSE);
+            throw new MylException(MylException.Type.HTTP_ERROR_SEND_RESPONSE, e.getMessage());
         }
     }
 }

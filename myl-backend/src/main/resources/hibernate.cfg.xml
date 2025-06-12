@@ -15,9 +15,8 @@
         <!-- HikariCP connection details -->
         <property name="hibernate.hikari.dataSourceClassName">com.mysql.cj.jdbc.MysqlDataSource</property>
         ***REMOVED***
+***REMOVED***
         ***REMOVED***
-<!--        <property name="hibernate.hikari.dataSource.url">jdbc:mysql://myl-db-rds.ce7wqiee6j8m.us-east-1.rds.amazonaws.com:3306/myl_db?serverTimezone=America/Argentina/Buenos_Aires</property>-->
-<!--        <property name="hibernate.hikari.dataSource.user">admin</property>-->
         ***REMOVED***
 
         <!-- HikariCP tuning -->
