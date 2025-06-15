@@ -107,9 +107,9 @@ public class DeckCardController {
 
             for (DeleteCardFromDecksDTO deleteCardFromDecksDTO : deleteCardFromDecksDTOs) {
                 Integer deckId = deleteCardFromDecksDTO.getDeckId();
-                Integer amount = deleteCardFromDecksDTO.getAmount();
+                Integer quantity = deleteCardFromDecksDTO.getQuantity();
 
-                if (deckId == null || amount == null || amount < 1 || amount > 3) {
+                if (deckId == null || quantity == null || quantity < 1 || quantity > 3) {
                     return new HttpResponse(400, gson.toJson(new ErrorTemplateDTO(400, "Datos inválidos para eliminar carta del mazo")));
                 }
 
@@ -128,8 +128,8 @@ public class DeckCardController {
                 }
 
                 int currentQuantity = deckCard.getQuantity();
-                if (currentQuantity > amount) {
-                    deckCard.setQuantity(currentQuantity - amount);
+                if (currentQuantity > quantity) {
+                    deckCard.setQuantity(currentQuantity - quantity);
                     daoDeckCard.update(deckCard);
                 } else {
                     daoDeckCard.deleteById(deckCardId);
