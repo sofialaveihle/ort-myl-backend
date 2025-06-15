@@ -13,6 +13,7 @@ import ar.com.mylback.utils.MylException;
 import ar.com.myldtos.ErrorTemplateDTO;
 import ar.com.myldtos.SuccessTemplateDTO;
 import ar.com.myldtos.users.AddCardToDeckDTO;
+import ar.com.myldtos.users.DeleteCardFromDecksDTO;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -93,22 +94,53 @@ public class DeckCardController {
         }
     }
 
-    public HttpResponse deleteCardFromDeckDeck(Integer cardId, Integer deckId) {
+    public HttpResponse deleteCardFromDecks(Integer cardId, String body) {
         try {
             Player player = getPlayer();
             if (player == null) {
                 return new HttpResponse(404, gson.toJson(new ErrorTemplateDTO(404, "Usuario no encontrado para eliminar carta del mazo")));
             }
 
-            DeckCardId deckCardId = new DeckCardId();
-            deckCardId.setCardId(cardId);
-            deckCardId.setDeckId(deckId);
+            Type listType = new TypeToken<List<DeleteCardFromDecksDTO>>() {
+            }.getType();
+            List<DeleteCardFromDecksDTO> deleteCardFromDecksDTOs = gson.fromJson(body, listType);
 
-            daoDeckCard.deleteById(deckCardId);
+            for (DeleteCardFromDecksDTO deleteCardFromDecksDTO : deleteCardFromDecksDTOs) {
+                Integer deckId = deleteCardFromDecksDTO.getDeckId();
+                Integer amount = deleteCardFromDecksDTO.getAmount();
 
-            return new HttpResponse(200, gson.toJson(new SuccessTemplateDTO("Carta eliminada exitosamente")));
+                if (deckId == null || amount == null || amount < 1 || amount > 3) {
+                    return new HttpResponse(400, gson.toJson(new ErrorTemplateDTO(400, "Datos inválidos para eliminar carta del mazo")));
+                }
+
+                Deck deck = daoDeck.findById(player.getUuid(), deckId);
+                if (deck == null) {
+                    return new HttpResponse(404, gson.toJson(new ErrorTemplateDTO(404, "Mazo no encontrado")));
+                }
+
+                DeckCardId deckCardId = new DeckCardId();
+                deckCardId.setCardId(cardId);
+                deckCardId.setDeckId(deckId);
+
+                DeckCard deckCard = daoDeckCard.findById(deckCardId);
+                if (deckCard == null) {
+                    return new HttpResponse(404, gson.toJson(new ErrorTemplateDTO(404, "No existe la carta")));
+                }
+
+                int currentQuantity = deckCard.getQuantity();
+                if (currentQuantity > amount) {
+                    deckCard.setQuantity(currentQuantity - amount);
+                    daoDeckCard.update(deckCard);
+                } else {
+                    daoDeckCard.deleteById(deckCardId);
+                }
+            }
+
+            return new HttpResponse(200, gson.toJson(new SuccessTemplateDTO("Cartas eliminadas exitosamente")));
         } catch (MylException e) {
             return new HttpResponse(500, gson.toJson(new ErrorTemplateDTO(500, "Error al eliminar la carta del mazo")));
+        } catch (Exception e) {
+            return new HttpResponse(500, gson.toJson(new ErrorTemplateDTO(500, "Error inesperado al eliminar o actualizar la carta: " + e.getMessage())));
         }
     }
 
