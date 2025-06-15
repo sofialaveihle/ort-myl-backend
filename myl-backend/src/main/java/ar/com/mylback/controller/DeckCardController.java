@@ -20,7 +20,9 @@ import com.google.gson.reflect.TypeToken;
 import javax.annotation.Nullable;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DeckCardController {
     private final Gson gson;
@@ -59,10 +61,21 @@ public class DeckCardController {
             List<AddCardToDeckDTO> addCardToDeckDTOs = gson.fromJson(body, listType);
 
             List<DeckCard> deckCards = new ArrayList<>();
+            Map<Integer, Integer> cardsInDeck = new HashMap<>();
             for (AddCardToDeckDTO addCardToDeckDTO : addCardToDeckDTOs) {
                 // validate if the Deck exists
                 Deck deck = daoDeck.findById(player.getUuid(), addCardToDeckDTO.getDeckId());
-                if (deck != null && (addCardToDeckDTO.getQuantity() > 0 || addCardToDeckDTO.getQuantity() <= 3)) {
+                if (deck == null || (addCardToDeckDTO.getQuantity() <= 0 || addCardToDeckDTO.getQuantity() > 3)) {
+                    return new HttpResponse(404, gson.toJson(new ErrorTemplateDTO(404, "Mazo invalido para cargar las cartas")));
+                }
+
+                cardsInDeck.compute(deck.getId(), (deckId, currentTotal) ->
+                        currentTotal == null
+                                ? deck.getDeckCardsTotal() + addCardToDeckDTO.getQuantity()
+                                : currentTotal + addCardToDeckDTO.getQuantity()
+                );
+
+                if (cardsInDeck.getOrDefault(deck.getId(), 0) < Deck.MAX_DECK_CARDS) {
                     DeckCard deckCard = new DeckCard();
                     DeckCardId deckCardId = new DeckCardId();
                     deckCardId.setCardId(cardId);
@@ -76,17 +89,21 @@ public class DeckCardController {
                             deckCard.setQuantity(totalQuantity);
                             daoDeckCard.update(deckCard);
                         } else {
-                            return new HttpResponse(500, gson.toJson(new ErrorTemplateDTO(500, "Max 3 cartas iguales por mazo")));
+                            return new HttpResponse(500, gson.toJson(new ErrorTemplateDTO(500, "Se excedio el limite de 3 cartas iguales para el mazo " + deck.getId())));
                         }
                     } else {
-                        deckCards.add(deckCard);
+                        if (addCardToDeckDTO.getQuantity() > 3) {
+                            return new HttpResponse(500, gson.toJson(new ErrorTemplateDTO(500, "Se excedió el límite de 3 cartas iguales para el mazo " + deck.getId())));
+                        }
+                        deckCards.add(deckCard); // update the quantity of the new cards
                     }
                 } else {
-                    return new HttpResponse(404, gson.toJson(new ErrorTemplateDTO(404, "Mazo invalido para cargar las cartas")));
+                    return new HttpResponse(500, gson.toJson(new ErrorTemplateDTO(500, "No se pueden agregar mas de " + Deck.MAX_DECK_CARDS + " cartas al mazo " + deck.getId())));
                 }
+
             }
 
-            daoDeckCard.save(deckCards);
+            daoDeckCard.save(deckCards); // add the new cards
 
             return new HttpResponse(200, gson.toJson(new SuccessTemplateDTO("Cartas agregadas exitosamente")));
         } catch (MylException e) {
