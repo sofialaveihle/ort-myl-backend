@@ -370,12 +370,11 @@ public class RequestProcessor implements Runnable {
             ).deleteDeck(Integer.parseInt(PathHelper.getLastPathSegment(path)));
             sendResponse(exchange, response);
 
-        } else if (path.matches("/api/player/deck/\\d+/\\d+$")) { // {deckId} {cardId}
+        } else if (path.matches("/api/player/deckcard/\\d+$")) { // {deckId} {cardId}
 
             String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
             Integer cardId = Integer.parseInt(PathHelper.getLastPathSegment(path));
-            String shortPath = PathHelper.removeLastSegment(path);
-            Integer deckId = Integer.parseInt(PathHelper.getLastPathSegment(shortPath));
+            String body = new String(exchange.getRequestBody().readAllBytes());
 
             HttpResponse response = new DeckCardController(
                     injectorProvider.getGson(),
@@ -384,7 +383,7 @@ public class RequestProcessor implements Runnable {
                     injectorProvider.getDaoDeck(),
                     injectorProvider.getDaoDeckCard(),
                     authHeader
-            ).deleteCardFromDeckDeck(deckId, cardId);
+            ).deleteCardFromDecks(cardId, body);
             sendResponse(exchange, response);
 
         } else {
@@ -393,11 +392,14 @@ public class RequestProcessor implements Runnable {
     }
 
     private void sendResponse(HttpExchange exchange, HttpResponse response) throws MylException {
-        try (OutputStream os = exchange.getResponseBody()) {
-            exchange.sendResponseHeaders(response.statusCode(), response.body().getBytes().length);
-            os.write(response.body().getBytes(StandardCharsets.UTF_8));
+        try {
+            byte[] responseBytes = response.body().getBytes(StandardCharsets.UTF_8);
+            exchange.sendResponseHeaders(response.statusCode(), responseBytes.length);
+            try (OutputStream os = exchange.getResponseBody()) {
+                os.write(responseBytes);
+            }
         } catch (IOException e) {
-            throw new MylException(MylException.Type.HTTP_ERROR_SEND_RESPONSE);
+            throw new MylException(MylException.Type.HTTP_ERROR_SEND_RESPONSE, e.getMessage());
         }
     }
 }

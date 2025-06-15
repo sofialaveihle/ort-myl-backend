@@ -58,8 +58,12 @@ public class DeckController {
             deck.setPlayer(player);
 
             Set<DeckCard> deckCards = deck.getCards();
+            int cardsAmount = deck.getDeckCardsTotal();
             deck.setCards(null);
 
+            if (cardsAmount > Deck.MAX_DECK_CARDS) {
+                return new HttpResponse(500, gson.toJson(new ErrorTemplateDTO(500, "Max" + Deck.MAX_DECK_CARDS + "cartas por mazo")));
+            }
             for (DeckCard dc : deckCards) {
                 int quantity = dc.getQuantity();
                 if (quantity <= 0 || quantity > 3) {

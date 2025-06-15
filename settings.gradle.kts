@@ -1,3 +1,5 @@
 rootProject.name = "myl_back"
-include("LoadDatabase")
+
+include("myl-backend")
 include("ort-myl-dtos")
+include("LoadDatabase")

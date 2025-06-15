@@ -7,6 +7,7 @@ import java.util.Set;
 @Entity
 @Table(name = "player_decks")
 public class Deck {
+    public static final int MAX_DECK_CARDS = 50;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "deck_id")
@@ -63,5 +64,9 @@ public class Deck {
 
     public void setCards(Set<DeckCard> cards) {
         this.cards = cards;
+    }
+
+    public int getDeckCardsTotal() {
+        return cards != null && !cards.isEmpty() ? cards.stream().mapToInt(DeckCard::getQuantity).sum() : 0;
     }
 }

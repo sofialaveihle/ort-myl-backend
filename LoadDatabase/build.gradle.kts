@@ -18,7 +18,7 @@ java {
 dependencies {
     implementation("software.amazon.awssdk:s3:2.25.20")
     implementation("com.google.code.gson:gson:2.13.0")
-    implementation(project(":")) // root project, put the name if it's a module
+    implementation(project(":myl-backend")) // root project, put the name if it's a module
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
     implementation("com.google.guava:guava:32.1.2-jre") // rate limiter
