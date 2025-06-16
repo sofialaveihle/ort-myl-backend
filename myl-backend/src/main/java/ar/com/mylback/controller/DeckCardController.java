@@ -75,7 +75,7 @@ public class DeckCardController {
                                 : currentTotal + addCardToDeckDTO.getQuantity()
                 );
 
-                if (cardsInDeck.getOrDefault(deck.getId(), 0) < Deck.MAX_DECK_CARDS) {
+                if (cardsInDeck.getOrDefault(deck.getId(), 0) <= Deck.MAX_DECK_CARDS) {
                     DeckCard deckCard = new DeckCard();
                     DeckCardId deckCardId = new DeckCardId();
                     deckCardId.setCardId(cardId);

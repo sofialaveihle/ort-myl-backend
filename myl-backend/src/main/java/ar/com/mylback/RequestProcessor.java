@@ -234,6 +234,17 @@ public class RequestProcessor implements Runnable {
                     authHeader).getPlayerDeckById(Integer.parseInt(PathHelper.getLastPathSegment(path)));
             sendResponse(exchange, response);
 
+        } else if (path.equals("/api/player/cards")) {
+
+            String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
+            HttpResponse response = new PlayerCardController(injectorProvider.getGson(),
+                    injectorProvider.getFirebaseAuthValidator(),
+                    injectorProvider.getDaoPlayer(),
+                    injectorProvider.getDaoPlayerCard(),
+                    injectorProvider.getPlayerCardMapper(),
+                    authHeader).getPlayerCards(queryString);
+            sendResponse(exchange, response);
+
         } else {
             sendResponse(exchange, new HttpResponse(400, "Not Found"));
         }
@@ -285,6 +296,16 @@ public class RequestProcessor implements Runnable {
                     injectorProvider.getDaoDeck(),
                     injectorProvider.getDaoDeckCard(),
                     authHeader).addCardToDecks(Integer.parseInt(PathHelper.getLastPathSegment(path)), body);
+            sendResponse(exchange, response);
+        } else if (path.equals("/api/player/cards")) {
+
+            String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
+            HttpResponse response = new PlayerCardController(injectorProvider.getGson(),
+                    injectorProvider.getFirebaseAuthValidator(),
+                    injectorProvider.getDaoPlayer(),
+                    injectorProvider.getDaoPlayerCard(),
+                    injectorProvider.getPlayerCardMapper(),
+                    authHeader).addPlayerCards(body);
             sendResponse(exchange, response);
 
         } else {
@@ -344,9 +365,10 @@ public class RequestProcessor implements Runnable {
     }
 
     private void deleteVerb(String path, HttpExchange exchange) throws Exception {
+        String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
+
         if  (path.equals("/api/users")) {
 
-            String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
             HttpResponse response = new AuthController(injectorProvider.getGson(),
                     injectorProvider.getFirebaseAuthValidator(),
                     injectorProvider.getDaoPlayer(),
@@ -358,7 +380,6 @@ public class RequestProcessor implements Runnable {
 
         } else if (path.matches("/api/player/deck/\\d+$")) {
 
-            String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
             HttpResponse response = new DeckController(
                     injectorProvider.getGson(),
                     injectorProvider.getFirebaseAuthValidator(),
@@ -372,7 +393,6 @@ public class RequestProcessor implements Runnable {
 
         } else if (path.matches("/api/player/deckcard/\\d+$")) { // {deckId} {cardId}
 
-            String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
             Integer cardId = Integer.parseInt(PathHelper.getLastPathSegment(path));
             String body = new String(exchange.getRequestBody().readAllBytes());
 
@@ -384,6 +404,16 @@ public class RequestProcessor implements Runnable {
                     injectorProvider.getDaoDeckCard(),
                     authHeader
             ).deleteCardFromDecks(cardId, body);
+            sendResponse(exchange, response);
+        } else if (path.equals("/api/player/cards")) {
+
+            String body = new String(exchange.getRequestBody().readAllBytes());
+            HttpResponse response = new PlayerCardController(injectorProvider.getGson(),
+                    injectorProvider.getFirebaseAuthValidator(),
+                    injectorProvider.getDaoPlayer(),
+                    injectorProvider.getDaoPlayerCard(),
+                    injectorProvider.getPlayerCardMapper(),
+                    authHeader).deletePlayerCards(body);
             sendResponse(exchange, response);
 
         } else {

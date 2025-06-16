@@ -42,11 +42,4 @@ public class DAODeckCard extends DAO<DeckCard, DeckCardId> {
         });
 
     }
-
-    @Override
-    public void delete(DeckCard deckCard) throws MylException {
-        HibernateUtil.withTransaction(session -> {
-
-        });
-    }
 }

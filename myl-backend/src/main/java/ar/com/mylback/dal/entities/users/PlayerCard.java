@@ -30,6 +30,14 @@ public class PlayerCard {
         this.id = id;
     }
 
+    public Player getPlayer() {
+        return player;
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
     public Card getCard() {
         return card;
     }

@@ -2,6 +2,7 @@ package ar.com.mylback.utils.entitydtomappers.users;
 
 import ar.com.mylback.dal.entities.users.DeckCard;
 import ar.com.mylback.dal.entities.users.DeckCardId;
+import ar.com.mylback.utils.MylException;
 import ar.com.mylback.utils.entitydtomappers.cards.CardMapper;
 import jakarta.validation.constraints.NotNull;
 import ar.com.myldtos.users.DeckCardDTO;
@@ -9,8 +10,12 @@ import ar.com.myldtos.users.DeckCardDTO;
 public class DeckCardMapper {
     private final CardMapper cardMapper;
 
-    public DeckCardMapper(CardMapper cardMapper) {
-        this.cardMapper = cardMapper;
+    public DeckCardMapper(CardMapper cardMapper) throws MylException {
+        if (cardMapper != null) {
+            this.cardMapper = cardMapper;
+        } else {
+            throw new MylException(MylException.Type.NULL_PARAMETER);
+        }
     }
 
     @NotNull
@@ -23,6 +28,7 @@ public class DeckCardMapper {
         return deckCardDTO;
     }
 
+    @NotNull
     public DeckCard toEntity(DeckCardDTO deckCardDTO) {
         DeckCard deckCard = new DeckCard();
         if (deckCardDTO != null) {
