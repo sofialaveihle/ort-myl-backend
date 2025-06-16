@@ -14,9 +14,6 @@ public abstract class User {
     @Column(name = "name", length = 100)
     private String name;
 
-    @Column(name = "is_admin", nullable = false)
-    private boolean isAdmin = false;
-
     public String getUuid() {
         return uuid;
     }
@@ -39,13 +36,5 @@ public abstract class User {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public boolean isAdmin() {
-        return isAdmin;
-    }
-
-    public void setAdmin(boolean admin) {
-        isAdmin = admin;
     }
 }

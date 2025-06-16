@@ -1,9 +1,10 @@
 package ar.com.mylback.controller;
 
 import ar.com.mylback.auth.FirebaseAuthValidator;
+import ar.com.mylback.dal.crud.users.DAOPlayer;
 import ar.com.mylback.dal.crud.users.DAOStore;
+import ar.com.mylback.dal.entities.users.Player;
 import ar.com.mylback.dal.entities.users.Store;
-import ar.com.mylback.dal.entities.users.User;
 import ar.com.mylback.utils.HttpResponse;
 import ar.com.mylback.utils.MylException;
 import ar.com.mylback.utils.url.QueryString;
@@ -33,8 +34,9 @@ public class StoreController {
     }
 
     private boolean isAdmin(String uid) throws MylException {
-        User user = daoStore.findByUid(uid);
-        return user != null && user.isAdmin();
+        DAOPlayer daoPlayer = new DAOPlayer();
+        Player player = daoPlayer.findByUid(uid);
+        return player != null && player.isAdmin();
     }
 
     public HttpResponse getStoresByValidation(String authHeader, QueryString queryString) {
@@ -100,7 +102,7 @@ public class StoreController {
                 return new HttpResponse(400, gson.toJson(new ErrorTemplateDTO(400, "Store UID invalido")));
             }
 
-            return new HttpResponse(200, gson.toJson(new SuccessTemplateDTO("Tienda validada correctamente")));
+            return new HttpResponse(200, gson.toJson(new SuccessTemplateDTO("Tienda invalidada")));
         } catch (MylException e) {
             return new HttpResponse(400, gson.toJson(new ErrorTemplateDTO(400, "Error de negocio", e.getMessage())));
         }

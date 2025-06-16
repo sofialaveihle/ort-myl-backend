@@ -13,11 +13,22 @@ import java.util.Set;
         )
 })
 public class Player extends User {
+    @Column(name = "is_admin", nullable = false)
+    private boolean isAdmin = false;
+
     @OneToMany(mappedBy = "player", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Deck> decks;
 
     @OneToMany(mappedBy = "player", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<PlayerCard> playerCards = new HashSet<>();
+
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(boolean admin) {
+        isAdmin = admin;
+    }
 
     public Set<Deck> getDecks() {
         return decks;

@@ -335,7 +335,7 @@ public class RequestProcessor implements Runnable {
                     injectorProvider.getDaoPlayer()).updatePlayer(body, authHeader);
             sendResponse(exchange, response);
 
-        } else if (path.matches("/api/admin/stores/validate/[^\\n\\r/]+$")) {
+        } else if (path.matches("/api/admin/stores/invalidate/[^\\n\\r/]+$")) {
 
             String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
             String storeUid = PathHelper.getLastPathSegment(path);
