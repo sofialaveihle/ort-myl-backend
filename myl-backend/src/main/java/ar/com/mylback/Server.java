@@ -3,10 +3,7 @@ package ar.com.mylback;
 import ar.com.mylback.auth.FirebaseAuthValidator;
 
 import ar.com.mylback.dal.crud.cards.DAOCard;
-import ar.com.mylback.dal.crud.users.DAODeck;
-import ar.com.mylback.dal.crud.users.DAODeckCard;
-import ar.com.mylback.dal.crud.users.DAOPlayer;
-import ar.com.mylback.dal.crud.users.DAOStore;
+import ar.com.mylback.dal.crud.users.*;
 import ar.com.mylback.utils.ImageUrlGenerator;
 import ar.com.mylback.utils.InjectorProvider;
 import ar.com.mylback.utils.MylException;
@@ -103,7 +100,7 @@ public class Server {
         UserMapper userMapper = new UserMapper();
         DeckCardMapper deckCardMapper = new DeckCardMapper(cardMapper);
         DeckMapper deckMapper = new DeckMapper(deckCardMapper);
-        PlayerCardMapper playerCardMapper = new PlayerCardMapper();
+        PlayerCardMapper playerCardMapper = new PlayerCardMapper(cardMapper);
         PlayerMapper playerMapper = new PlayerMapper(deckMapper, playerCardMapper);
         StoreMapper storeMapper = new StoreMapper();
 
@@ -115,6 +112,7 @@ public class Server {
                 DAOStore::new,
                 DAODeck::new,
                 DAODeckCard::new,
+                DAOPlayerCard::new,
                 () -> cardMapper,
                 () -> userMapper,
                 () -> playerMapper,
@@ -125,7 +123,8 @@ public class Server {
                 () -> keyWordMapper,
                 () -> raceMapper,
                 () -> typeMapper,
-                () -> deckMapper
+                () -> deckMapper,
+                () -> playerCardMapper
         );
     }
 }
