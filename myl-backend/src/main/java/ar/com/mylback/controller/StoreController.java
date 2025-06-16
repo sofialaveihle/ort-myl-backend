@@ -3,6 +3,7 @@ package ar.com.mylback.controller;
 import ar.com.mylback.auth.FirebaseAuthValidator;
 import ar.com.mylback.dal.crud.users.DAOStore;
 import ar.com.mylback.dal.entities.users.Store;
+import ar.com.mylback.dal.entities.users.User;
 import ar.com.mylback.utils.HttpResponse;
 import ar.com.mylback.utils.MylException;
 import ar.com.mylback.utils.url.QueryString;
@@ -31,22 +32,21 @@ public class StoreController {
         }
     }
 
-    private boolean isAdmin(String uid) {
-        // TODO: cambiar esto por una verificación real
-        return uid.equals("admin-uid-temporal");
+    private boolean isAdmin(String uid) throws MylException {
+        User user = daoStore.findByUid(uid);
+        return user != null && user.isAdmin();
     }
 
     public HttpResponse getStoresByValidation(String authHeader, QueryString queryString) {
         try {
             // Solo verificamos el token si se están pidiendo tiendas NO validadas
             boolean isValid = queryString.getValid();
-/*            if (!isValid) {
+            if (!isValid) {
                 String uid = firebaseAuthValidator.validateAndGetUid(authHeader);
-
                 if (!isAdmin(uid)) {
                     return new HttpResponse(401, gson.toJson(new ErrorTemplateDTO(401, "Acceso no autorizado. Solo administradores pueden ver tiendas no validadas.")));
                 }
-            }*/
+            }
 
             List<Store> stores = daoStore.findAllByValidationStatus(isValid);
 
@@ -82,19 +82,19 @@ public class StoreController {
         }
     }
 
-    public HttpResponse validateStore(String storeUid, String authHeader) {
+    public HttpResponse invalidateStore(String storeUid, String authHeader) {
         try {
-/*            String uidAdminUser = firebaseAuthValidator.validateAndGetUid(authHeader);
+            String uidAdminUser = firebaseAuthValidator.validateAndGetUid(authHeader);
             if (!isAdmin(uidAdminUser)) {
-                return new HttpResponse(403, gson.toJson(new ErrorTemplateDTO(403, "Acceso no autorizado. Solo administradores pueden validar tiendas.")));
-            }*/
+                return new HttpResponse(403, gson.toJson(new ErrorTemplateDTO(403, "Acceso no autorizado. Solo administradores pueden invalidar tiendas.")));
+            }
 
             if (storeUid != null) {
                 Store store = daoStore.findByUid(storeUid);
                 if (store == null) {
                     return new HttpResponse(404, gson.toJson(new ErrorTemplateDTO(404, "Tienda no encontrada")));
                 }
-                store.setValid(true);
+                store.setValid(false);
                 daoStore.update(store);
             } else {
                 return new HttpResponse(400, gson.toJson(new ErrorTemplateDTO(400, "Store UID invalido")));

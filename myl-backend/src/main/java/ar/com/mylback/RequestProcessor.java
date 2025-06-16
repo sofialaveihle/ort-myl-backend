@@ -323,7 +323,7 @@ public class RequestProcessor implements Runnable {
                     injectorProvider.getFirebaseAuthValidator(),
                     injectorProvider.getDaoStore(),
                     injectorProvider.getStoreMapper());
-            HttpResponse response = controller.validateStore(storeUid, authHeader);
+            HttpResponse response = controller.invalidateStore(storeUid, authHeader);
             sendResponse(exchange, response);
 
         } else if (path.matches("/api/player/deck/\\d+$")) {
