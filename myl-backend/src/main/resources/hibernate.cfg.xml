@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+
+        <!-- Hibernate tuning -->
+        <property name="hibernate.hbm2ddl.auto">validate</property>
+        <property name="hibernate.show_sql">true</property>
+
+        <!-- Use HikariCP -->
+        <property name="hibernate.connection.provider_class">org.hibernate.hikaricp.internal.HikariCPConnectionProvider</property>
+
+        <!-- HikariCP connection details -->
+        <property name="hibernate.hikari.dataSourceClassName">com.mysql.cj.jdbc.MysqlDataSource</property>
+        ***REMOVED***
+***REMOVED***
+        ***REMOVED***
+        ***REMOVED***
+
+        <!-- HikariCP tuning -->
+        <property name="hibernate.hikari.minimumIdle">5</property>
+        <property name="hibernate.hikari.maximumPoolSize">15</property>
+        <property name="hibernate.hikari.idleTimeout">300000</property>
+        <property name="hibernate.hikari.connectionTimeout">20000</property>
+        <property name="hibernate.hikari.maxLifetime">1800000</property>
+
+        <!-- Optional -->
+        <property name="hibernate.connection.transacted">true</property>
+
+        <!-- Entity mapping -->
+        <!-- Cards entities -->
+        <mapping class="ar.com.mylback.dal.entities.cards.Card"/>
+        <mapping class="ar.com.mylback.dal.entities.cards.Collection"/>
+        <mapping class="ar.com.mylback.dal.entities.cards.Format"/>
+        <mapping class="ar.com.mylback.dal.entities.cards.KeyWord"/>
+        <mapping class="ar.com.mylback.dal.entities.cards.Race"/>
+        <mapping class="ar.com.mylback.dal.entities.cards.Rarity"/>
+        <mapping class="ar.com.mylback.dal.entities.cards.Type"/>
+
+        <!-- Users entities -->
+        <mapping class="ar.com.mylback.dal.entities.users.Store"/>
+        <mapping class="ar.com.mylback.dal.entities.users.Player"/>
+        <mapping class="ar.com.mylback.dal.entities.users.PlayerCard"/>
+        <mapping class="ar.com.mylback.dal.entities.users.Deck"/>
+        <mapping class="ar.com.mylback.dal.entities.users.DeckCard"/>
+
+
+
+    </session-factory>
+</hibernate-configuration>
