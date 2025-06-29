@@ -14,13 +14,13 @@ import java.util.List;
 public class CardPropertyController<T extends CardProperties, R extends CardPropertiesDTO, U extends CardPropertiesMapper<T, R>> {
     private final Gson gson;
     private final U mapper;
-    private final Class<T> entityClass;
+    private final DAOCardProperties<T, Integer> daoCardProperties;
 
-    protected CardPropertyController(Gson gson, U mapper, Class<T> entityClass) throws MylException {
-        if (gson != null && mapper != null && entityClass != null) {
+    protected CardPropertyController(Gson gson, U mapper, DAOCardProperties<T, Integer> daoCardProperties) throws MylException {
+        if (gson != null && mapper != null && daoCardProperties != null) {
             this.gson = gson;
             this.mapper = mapper;
-            this.entityClass = entityClass;
+            this.daoCardProperties = daoCardProperties;
         } else {
             throw new MylException(MylException.Type.NULL_PARAMETER);
         }
@@ -28,7 +28,6 @@ public class CardPropertyController<T extends CardProperties, R extends CardProp
 
     public HttpResponse getAll() {
         try {
-            DAOCardProperties<T, Integer> daoCardProperties = new DAOCardProperties<>(entityClass);
             List<T> cardPropertiesList = daoCardProperties.findAll();
 
             List<R> cardPropertiesDTOList = cardPropertiesList.stream().map(mapper::toDTO).toList();

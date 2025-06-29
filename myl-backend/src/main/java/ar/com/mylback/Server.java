@@ -3,7 +3,9 @@ package ar.com.mylback;
 import ar.com.mylback.auth.FirebaseAuthValidator;
 
 import ar.com.mylback.dal.crud.cards.DAOCard;
+import ar.com.mylback.dal.crud.cards.DAOCardProperties;
 import ar.com.mylback.dal.crud.users.*;
+import ar.com.mylback.dal.entities.cards.*;
 import ar.com.mylback.utils.ImageUrlGenerator;
 import ar.com.mylback.utils.InjectorProvider;
 import ar.com.mylback.utils.MylException;
@@ -108,6 +110,12 @@ public class Server {
                 () -> gson,
                 () -> firebaseAuthValidator,
                 DAOCard::new,
+                () -> new DAOCardProperties<>(Collection.class),
+                () -> new DAOCardProperties<>(Format.class),
+                () -> new DAOCardProperties<>(KeyWord.class),
+                () -> new DAOCardProperties<>(Race.class),
+                () -> new DAOCardProperties<>(Rarity.class),
+                () -> new DAOCardProperties<>(Type.class),
                 DAOPlayer::new,
                 DAOStore::new,
                 DAODeck::new,
