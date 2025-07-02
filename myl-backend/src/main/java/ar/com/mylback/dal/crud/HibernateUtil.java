@@ -20,7 +20,7 @@ public class HibernateUtil {
     public static synchronized SessionFactory getSessionFactory() throws MylException {
         if (sessionFactory == null) {
             try {
-                sessionFactory = new Configuration()
+                Configuration configuration = new Configuration()
                         .configure("hibernate.cfg.xml")
                         .addAnnotatedClass(Card.class)
                         .addAnnotatedClass(Collection.class)
@@ -29,10 +29,17 @@ public class HibernateUtil {
                         .addAnnotatedClass(Race.class)
                         .addAnnotatedClass(Rarity.class)
                         .addAnnotatedClass(Type.class)
-                        .addAnnotatedClass(User.class)
-                        .addAnnotatedClass(Player.class)
                         .addAnnotatedClass(Store.class)
-                        .buildSessionFactory();
+                        .addAnnotatedClass(Player.class)
+                        .addAnnotatedClass(PlayerCard.class)
+                        .addAnnotatedClass(Deck.class)
+                        .addAnnotatedClass(DeckCard.class);
+
+                configuration.setProperty("hibernate.hikari.dataSource.url", System.getenv("MYL_DB_URL"));
+                configuration.setProperty("hibernate.hikari.dataSource.user", System.getenv("MYL_DB_USER"));
+                configuration.setProperty("hibernate.hikari.dataSource.password", System.getenv("MYL_DB_PASS"));
+
+                sessionFactory = configuration.buildSessionFactory();
             } catch (HibernateException ex) {
                 throw new MylException();
             }

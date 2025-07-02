@@ -9,6 +9,7 @@ import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
 import com.google.firebase.auth.UserRecord;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -21,13 +22,7 @@ public class FirebaseAuthValidator {
     private void init() throws MylException {
         try {
             // 1. Leer el archivo .json de la cuenta de servicio
-            InputStream serviceAccount = FirebaseAuthValidator.class
-                    .getClassLoader()
-                    .getResourceAsStream("firebase/serviceAccountKey.json");
-
-            if (serviceAccount == null) {
-                throw new RuntimeException("No se encontró el archivo serviceAccountKey.json");
-            }
+            FileInputStream serviceAccount = new FileInputStream(System.getenv("MYL_FIREBASE_CREDENTIALS"));
 
             // 2. Configurar las credenciales con el stream del archivo
             FirebaseOptions options = FirebaseOptions.builder()

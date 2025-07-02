@@ -2,7 +2,9 @@ package ar.com.mylback.utils;
 
 import ar.com.mylback.auth.FirebaseAuthValidator;
 import ar.com.mylback.dal.crud.cards.DAOCard;
+import ar.com.mylback.dal.crud.cards.DAOCardProperties;
 import ar.com.mylback.dal.crud.users.*;
+import ar.com.mylback.dal.entities.cards.*;
 import ar.com.mylback.utils.entitydtomappers.cards.*;
 import ar.com.mylback.utils.entitydtomappers.users.*;
 import com.google.gson.Gson;
@@ -13,6 +15,12 @@ public class InjectorProvider {
     private final Supplier<Gson> gsonSupplier;
     private final Supplier<FirebaseAuthValidator> firebaseAuthValidatorSupplier;
     private final Supplier<DAOCard<Integer>> daoCardSupplier;
+    private final Supplier<DAOCardProperties<Collection, Integer>> daoCollectionSupplier;
+    private final Supplier<DAOCardProperties<Format, Integer>> daoFormatSupplier;
+    private final Supplier<DAOCardProperties<KeyWord, Integer>> daoKeyWordSupplier;
+    private final Supplier<DAOCardProperties<Race, Integer>> daoRaceSupplier;
+    private final Supplier<DAOCardProperties<Rarity, Integer>> daoRaritySupplier;
+    private final Supplier<DAOCardProperties<Type, Integer>> daoTypeSupplier;
     private final Supplier<DAOPlayer> daoPlayerSupplier;
     private final Supplier<DAOStore> daoStoreSupplier;
     private final Supplier<DAODeck> daoDeckSupplier;
@@ -34,6 +42,12 @@ public class InjectorProvider {
     public InjectorProvider(Supplier<Gson> gsonSupplier,
                             Supplier<FirebaseAuthValidator> firebaseAuthValidatorSupplier,
                             Supplier<DAOCard<Integer>> daoCardSupplier,
+                            Supplier<DAOCardProperties<Collection, Integer>> daoCollectionSupplier,
+                            Supplier<DAOCardProperties<Format, Integer>> daoFormatSupplier,
+                            Supplier<DAOCardProperties<KeyWord, Integer>> daoKeyWordSupplier,
+                            Supplier<DAOCardProperties<Race, Integer>> daoRaceSupplier,
+                            Supplier<DAOCardProperties<Rarity, Integer>> daoRaritySupplier,
+                            Supplier<DAOCardProperties<Type, Integer>> daoTypeSupplier,
                             Supplier<DAOPlayer> daoPlayerSupplier,
                             Supplier<DAOStore> daoStoreSupplier,
                             Supplier<DAODeck> daoDeckSupplier,
@@ -55,6 +69,12 @@ public class InjectorProvider {
         if (gsonSupplier == null ||
                 firebaseAuthValidatorSupplier == null ||
                 daoCardSupplier == null ||
+                daoCollectionSupplier == null ||
+                daoFormatSupplier == null ||
+                daoKeyWordSupplier == null ||
+                daoRaceSupplier == null ||
+                daoRaritySupplier == null ||
+                daoTypeSupplier == null ||
                 daoPlayerSupplier == null ||
                 daoStoreSupplier == null ||
                 daoDeckSupplier == null ||
@@ -78,6 +98,12 @@ public class InjectorProvider {
         this.gsonSupplier = gsonSupplier;
         this.firebaseAuthValidatorSupplier = firebaseAuthValidatorSupplier;
         this.daoCardSupplier = daoCardSupplier;
+        this.daoCollectionSupplier = daoCollectionSupplier;
+        this.daoFormatSupplier = daoFormatSupplier;
+        this.daoKeyWordSupplier = daoKeyWordSupplier;
+        this.daoRaceSupplier = daoRaceSupplier;
+        this.daoRaritySupplier = daoRaritySupplier;
+        this.daoTypeSupplier = daoTypeSupplier;
         this.daoPlayerSupplier = daoPlayerSupplier;
         this.daoStoreSupplier = daoStoreSupplier;
         this.daoDeckSupplier = daoDeckSupplier;
@@ -107,6 +133,34 @@ public class InjectorProvider {
 
     public DAOCard<Integer> getDaoCard() {
         return daoCardSupplier.get();
+    }
+
+    public Supplier<DAOCard<Integer>> getDaoCardSupplier() {
+        return daoCardSupplier;
+    }
+
+    public DAOCardProperties<Collection, Integer> getDaoCollection() {
+        return daoCollectionSupplier.get();
+    }
+
+    public DAOCardProperties<Format, Integer> getDaoFormat() {
+        return daoFormatSupplier.get();
+    }
+
+    public DAOCardProperties<KeyWord, Integer> getDaoKeyWord() {
+        return daoKeyWordSupplier.get();
+    }
+
+    public DAOCardProperties<Race, Integer> getDaoRace() {
+        return daoRaceSupplier.get();
+    }
+
+    public DAOCardProperties<Rarity, Integer> getDaoRarity() {
+        return daoRaritySupplier.get();
+    }
+
+    public DAOCardProperties<Type, Integer> getDaoType() {
+        return daoTypeSupplier.get();
     }
 
     public DAOPlayer getDaoPlayer() {
