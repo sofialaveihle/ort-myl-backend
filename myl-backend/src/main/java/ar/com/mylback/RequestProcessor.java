@@ -138,37 +138,55 @@ public class RequestProcessor implements Runnable {
 
         } else if (path.equals("/api/collections")) {
 
-            CollectionController controller = new CollectionController(injectorProvider.getGson(), injectorProvider.getCollectionMapper());
+            CollectionController controller = new CollectionController(
+                    injectorProvider.getGson(),
+                    injectorProvider.getCollectionMapper(),
+                    injectorProvider.getDaoCollection());
             HttpResponse response = controller.getAll();
             sendResponse(exchange, response);
 
         } else if (path.equals("/api/rarities")) {
 
-            RarityController controller = new RarityController(injectorProvider.getGson(), injectorProvider.getRarityMapper());
+            RarityController controller = new RarityController(
+                    injectorProvider.getGson(),
+                    injectorProvider.getRarityMapper(),
+                    injectorProvider.getDaoRarity());
             HttpResponse response = controller.getAll();
             sendResponse(exchange, response);
 
         } else if (path.equals("/api/types")) {
 
-            TypeController controller = new TypeController(injectorProvider.getGson(), injectorProvider.getTypeMapper());
+            TypeController controller = new TypeController(
+                    injectorProvider.getGson(),
+                    injectorProvider.getTypeMapper(),
+                    injectorProvider.getDaoType());
             HttpResponse response = controller.getAll();
             sendResponse(exchange, response);
 
         } else if (path.equals("/api/races")) {
 
-            RaceController controller = new RaceController(injectorProvider.getGson(), injectorProvider.getRaceMapper());
+            RaceController controller = new RaceController(
+                    injectorProvider.getGson(),
+                    injectorProvider.getRaceMapper(),
+                    injectorProvider.getDaoRace());
             HttpResponse response = controller.getAll();
             sendResponse(exchange, response);
 
         } else if (path.equals("/api/formats")) {
 
-            FormatController controller = new FormatController(injectorProvider.getGson(), injectorProvider.getFormatMapper());
+            FormatController controller = new FormatController(
+                    injectorProvider.getGson(),
+                    injectorProvider.getFormatMapper(),
+                    injectorProvider.getDaoFormat());
             HttpResponse response = controller.getAll();
             sendResponse(exchange, response);
 
         } else if (path.equals("/api/keywords")) {
 
-            KeyWordController controller = new KeyWordController(injectorProvider.getGson(), injectorProvider.getKeyWordMapper());
+            KeyWordController controller = new KeyWordController(
+                    injectorProvider.getGson(),
+                    injectorProvider.getKeyWordMapper(),
+                    injectorProvider.getDaoKeyWord());
             HttpResponse response = controller.getAll();
             sendResponse(exchange, response);
 
